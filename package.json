@@ -11,6 +11,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@monaco-editor/react": "^4.7.0",
+    "@opencampus/ocid-connect-js": "^1.2.6",
     "framer-motion": "^12.4.10",
     "heroicons": "^2.2.0",
     "lucide-react": "^0.479.0",

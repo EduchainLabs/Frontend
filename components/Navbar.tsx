@@ -1,12 +1,16 @@
 "use client";
+import { useOCAuth } from "@opencampus/ocid-connect-js";
 import Link from "next/link";
 import React, { useState } from "react";
+import LoginButton from "./LoginButton";
+import Logo from "./ui/Mark";
 
 const Navbar = () => {
   const [isHovered, setIsHovered] = useState(false);
+  const { isInitialized , authState } = useOCAuth();
 
   return (
-    <nav className="flex justify-between items-center px-6 md:px-12 py-4 w-full">
+    <nav className="absolute top-0 left-0 z-10 flex justify-between items-center px-6 md:px-12 py-4 w-full">
       <div className="flex items-center">
         <Link
           href="/"
@@ -51,12 +55,16 @@ const Navbar = () => {
       </div>
 
       <div>
-        <Link
-          href="/get-started"
-          className="px-5 py-2 bg-violet-700 hover:bg-violet-600 rounded-md text-white transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-violet-500/30"
-        >
-          Get Started
-        </Link>
+        {isInitialized && authState.isAuthenticated ? (
+          <button className="px-5 py-2 bg-violet-700 hover:bg-violet-600 rounded-md flex gap-2 justify-start items-center text-white/80 transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-violet-500/30">
+            <Logo />
+            <div>
+              <span className="font-semibold">OCID</span> Connected
+            </div>
+          </button>
+        ) : (
+          <LoginButton />
+        )}
       </div>
     </nav>
   );
