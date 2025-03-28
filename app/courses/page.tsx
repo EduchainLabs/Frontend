@@ -3,8 +3,6 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Moon,
-  Sun,
   Clock,
   Book,
   Search,
@@ -14,8 +12,13 @@ import {
   Users,
   Zap,
   Award,
+  CheckCircle,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import BackButton from "@/components/BackButton";
+import { useSession } from "next-auth/react";
+import MotivationSection from "@/components/MotivationSection";
+import Footer from "@/components/Footer";
 
 // Course type definition
 export interface Course {
@@ -27,123 +30,135 @@ export interface Course {
   lessonCount: number;
   image: string;
   tags: string[];
-  popularity: number;
-  metadataIndex: number;
+  registrations: number;
 }
 
-// Course data
-const courses: Course[] = [
-  {
-    id: "basics-of-solidity",
-    title: "Basics of Solidity",
-    description:
-      "Learn the fundamentals of Solidity programming and smart contract development for blockchain applications. Perfect for beginners who want to start their blockchain journey.",
-    level: "Beginner",
-    duration: "3 weeks",
-    lessonCount: 7,
-    image: "/solidity.png",
-    tags: ["Solidity", "Smart Contracts", "Ethereum"],
-    popularity: 4280,
-    metadataIndex: 0,
-  },
-  {
-    id: "advanced-smart-contracts",
-    title: "Advanced Smart Contracts",
-    description:
-      "Dive deeper into complex smart contract patterns, security considerations, and optimization techniques. Learn gas optimization, security auditing, and advanced contract patterns.",
-    level: "Intermediate",
-    duration: "6 weeks",
-    lessonCount: 15,
-    image: "",
-    tags: ["Security", "Gas Optimization", "Design Patterns"],
-    popularity: 2150,
-    metadataIndex: 1,
-  },
-  {
-    id: "defi-development",
-    title: "DeFi Protocol Development",
-    description:
-      "Build decentralized finance applications including lending protocols, exchanges, and yield farming systems. Master the concepts behind modern DeFi architecture.",
-    level: "Advanced",
-    duration: "8 weeks",
-    lessonCount: 20,
-    image: "",
-    tags: ["DeFi", "Lending", "DEX"],
-    popularity: 1800,
-    metadataIndex: 1,
-  },
-  {
-    id: "nft-marketplace",
-    title: "NFT Marketplace Creation",
-    description:
-      "Learn to build a complete NFT marketplace from scratch. Understand token standards, metadata storage, and marketplace smart contracts for buying and selling digital assets.",
-    level: "Intermediate",
-    duration: "5 weeks",
-    lessonCount: 12,
-    image: "",
-    tags: ["NFTs", "ERC-721", "IPFS"],
-    popularity: 3600,
-    metadataIndex: 1,
-  },
-  {
-    id: "blockchain-security",
-    title: "Blockchain Security Fundamentals",
-    description:
-      "Learn to identify and prevent common vulnerabilities in smart contracts. Study real-world exploits and implement secure coding practices for blockchain applications.",
-    level: "Advanced",
-    duration: "4 weeks",
-    lessonCount: 10,
-    image: "",
-    tags: ["Security", "Auditing", "Bug Bounty"],
-    popularity: 2800,
-    metadataIndex: 1,
-  },
-  {
-    id: "web3-integration",
-    title: "Web3 Frontend Integration",
-    description:
-      "Connect your frontend applications to blockchain networks. Learn to use Web3.js, ethers.js, and other libraries to build decentralized application interfaces.",
-    level: "Beginner",
-    duration: "4 weeks",
-    lessonCount: 8,
-    image: "",
-    tags: ["Web3.js", "React", "dApps"],
-    popularity: 3200,
-    metadataIndex: 1,
-  },
-];
-
 export default function CoursesPage() {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userCourses, setUserCourses] = useState<string[]>([]);
+  const [completedCourses, setCompletedCourses] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState<
     "all" | "Beginner" | "Intermediate" | "Advanced"
   >("all");
-  const [darkMode, setDarkMode] = useState(false);
   const router = useRouter();
+  const { data: session } = useSession();
 
-  // Apply dark mode class to document
+  // Fetch courses from the database
   useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [darkMode]);
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch("/api/courses");
+        if (response.ok) {
+          const data = await response.json();
+          setCourses(data.courses);
+        }
+      } catch (error) {
+        console.error("Failed to fetch courses:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  // Initialize dark mode from localStorage
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      setDarkMode(true);
-    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setDarkMode(true);
-    }
+    fetchCourses();
   }, []);
 
-  // Save dark mode preference to localStorage
+  // Fetch user's registered courses and completed courses if user is logged in
   useEffect(() => {
-    localStorage.setItem("theme", darkMode ? "dark" : "light");
-  }, [darkMode]);
+    if (session?.user?.email) {
+      // Fetch registered courses
+      const fetchUserCourses = async () => {
+        try {
+          const response = await fetch(
+            `/api/users/courses?email=${session.user?.email}`
+          );
+          if (response.ok) {
+            const data = await response.json();
+            // Extract just the course IDs
+            setUserCourses(data.courses.map((course: any) => course.id));
+
+            // Extract completed courses
+            const completedCourseIds = data.courses
+              .filter((course: any) => course.completed)
+              .map((course: any) => course.id);
+            setCompletedCourses(completedCourseIds);
+          }
+        } catch (error) {
+          console.error("Failed to fetch user courses:", error);
+        }
+      };
+
+      // Fetch user completions directly from user data
+      const fetchCompletedCourses = async () => {
+        try {
+          const response = await fetch(
+            `/api/users/user?email=${session.user?.email}`
+          );
+          if (response.ok) {
+            const userData = await response.json();
+            if (userData.data.completedCourses) {
+              // Extract just the course IDs from completedCourses array
+              const completedIds = userData.data.completedCourses.map(
+                (course: any) => course.courseId
+              );
+              setCompletedCourses(completedIds);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to fetch completed courses:", error);
+        }
+      };
+
+      fetchUserCourses();
+      fetchCompletedCourses();
+    }
+  }, [session]);
+
+  // Handler for course registration
+  const handleCourseRegistration = async (courseId: string) => {
+    if (!session?.user?.email) {
+      // Redirect to login if user is not logged in
+      router.push("/gain-course-access");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/courses/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: session.user.email,
+          courseId: courseId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // If successful and it's a new registration, add to user courses
+        if (data.isNewRegistration) {
+          setUserCourses((prev) => [...prev, courseId]);
+
+          // Update the course count in the UI (optional)
+          setCourses(
+            courses.map((course) =>
+              course.id === courseId
+                ? { ...course, registrations: course.registrations + 1 }
+                : course
+            )
+          );
+        }
+
+        // Navigate to the course page
+        router.push(`/courses/${courseId}`);
+      }
+    } catch (error) {
+      console.error("Failed to register for course:", error);
+    }
+  };
 
   // Filter courses based on search term and level filter
   const filteredCourses = courses.filter(
@@ -170,8 +185,22 @@ export default function CoursesPage() {
     }
   };
 
+  // Check if a course is completed
+  const isCourseCompleted = (courseId: string) => {
+    return completedCourses.includes(courseId);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-gray-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
+      <BackButton />
       {/* Simplified background */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_top_left,_rgba(124,58,237,0.15),transparent_70%)]"></div>
@@ -181,7 +210,7 @@ export default function CoursesPage() {
       {/* Header area with title */}
       <div className="relative z-10">
         <Navbar />
-        <div className="max-w-6xl mx-auto px-6 py-12 ">
+        <div id="courses" className="max-w-6xl mx-auto px-6 py-12 ">
           <div className="text-center mb-12 mt-12">
             <div className="mb-3">
               <span className="bg-violet-900/30 text-violet-400 text-xs font-medium px-3 py-1 rounded-full inline-block">
@@ -211,13 +240,9 @@ export default function CoursesPage() {
             <div className="bg-gray-900/60 rounded-lg border border-violet-900/50 p-4 flex items-center">
               <Code className="w-5 h-5 text-violet-400 mr-3" />
               <div>
-                <p className="text-gray-400 text-sm">Learning Hours</p>
+                <p className="text-gray-400 text-sm">Lessons</p>
                 <h3 className="text-xl font-bold text-white">
-                  {courses.reduce(
-                    (sum, course) => sum + course.lessonCount * 2,
-                    0
-                  )}
-                  +
+                  {courses.reduce((sum, course) => sum + course.lessonCount, 0)}
                 </h3>
               </div>
             </div>
@@ -227,9 +252,8 @@ export default function CoursesPage() {
                 <p className="text-gray-400 text-sm">Active Students</p>
                 <h3 className="text-xl font-bold text-white">
                   {courses
-                    .reduce((sum, course) => sum + course.popularity, 0)
+                    .reduce((sum, course) => sum + course.registrations, 0)
                     .toLocaleString()}
-                  +
                 </h3>
               </div>
             </div>
@@ -320,6 +344,32 @@ export default function CoursesPage() {
               ))}
           </div>
 
+          {/* Progress stats - new section */}
+          {session?.user && (
+            <div className="bg-gray-900/60 rounded-lg border border-violet-900/50 p-4 mb-8">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <h3 className="text-lg font-medium text-white">
+                  Your Progress
+                </h3>
+                <div className="flex gap-4">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                    <span className="text-sm text-gray-300">
+                      Completed: {completedCourses.length}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+                    <span className="text-sm text-gray-300">
+                      In Progress:{" "}
+                      {userCourses.length - completedCourses.length}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Course grid - simplified cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCourses.length === 0 ? (
@@ -335,76 +385,110 @@ export default function CoursesPage() {
                 </div>
               </div>
             ) : (
-              filteredCourses.map((course) => (
-                <div
-                  key={course.id}
-                  className="bg-gray-900/60 border border-violet-900/30 rounded-lg overflow-hidden hover:border-violet-700 transition-all group"
-                >
-                  <div className="p-5">
-                    <div className="flex justify-between items-start mb-3">
-                      <span
-                        className={`text-xs font-medium px-2 py-0.5 rounded-full ${getDifficultyColor(
-                          course.level
-                        )}`}
-                      >
-                        {course.level}
-                      </span>
-                      <div className="flex items-center text-gray-400 text-sm">
-                        <Users className="w-3 h-3 mr-1" />
-                        {course.popularity.toLocaleString()}
-                      </div>
-                    </div>
+              filteredCourses.map((course) => {
+                const isCompleted = isCourseCompleted(course.id);
+                const isRegistered = userCourses.includes(course.id);
 
-                    <h3 className="text-lg font-semibold mb-2 text-white group-hover:text-violet-400 transition-colors">
-                      {course.title}
-                    </h3>
-                    <p className="text-gray-400 text-sm mb-4 line-clamp-2">
-                      {course.description}
-                    </p>
-
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {course.tags.slice(0, 3).map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2 py-0.5 text-xs bg-gray-800 text-gray-300 rounded"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="flex justify-between items-center text-sm text-gray-400">
-                      <div className="flex items-center">
-                        <Clock className="w-4 h-4 mr-1" />
-                        {course.duration}
-                      </div>
-                      <div className="flex items-center">
-                        <Book className="w-4 h-4 mr-1" />
-                        {course.lessonCount} lessons
-                      </div>
-                    </div>
-                  </div>
-
-                  <Link
-                    href={`/courses/${course.id}`}
-                    className="block bg-gray-800 hover:bg-violet-700 px-5 py-3 text-center text-sm font-medium text-white transition-colors"
+                return (
+                  <div
+                    key={course.id}
+                    className={`bg-gray-900/60 border rounded-lg overflow-hidden transition-all group flex flex-col h-full ${
+                      isCompleted
+                        ? "border-green-600/50 shadow-[0_0_15px_rgba(34,197,94,0.1)]"
+                        : isRegistered
+                        ? "border-blue-600/50"
+                        : "border-violet-900/30 hover:border-violet-700"
+                    }`}
                   >
-                    Explore Course
-                  </Link>
-                </div>
-              ))
+                    <div className="p-5 flex-grow flex flex-col">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`text-xs font-medium px-2 py-0.5 rounded-full ${getDifficultyColor(
+                              course.level
+                            )}`}
+                          >
+                            {course.level}
+                          </span>
+                          {isCompleted && (
+                            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-400/20 text-green-400 flex items-center">
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              Completed
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center text-gray-400 text-sm">
+                          <Users className="w-3 h-3 mr-1" />
+                          {course.registrations.toLocaleString()}
+                        </div>
+                      </div>
+
+                      <h3 className="text-lg font-semibold mb-2 text-white group-hover:text-violet-400 transition-colors">
+                        {course.title}
+                      </h3>
+                      <p className="text-gray-400 text-sm mb-4 line-clamp-2 flex-grow">
+                        {course.description}
+                      </p>
+
+                      {/* Tags moved to bottom */}
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {course.tags.slice(0, 3).map((tag) => (
+                          <span
+                            key={tag}
+                            className="px-2 py-0.5 text-xs bg-gray-800 text-gray-300 rounded"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Duration and lesson count moved to bottom */}
+                      <div className="flex justify-between items-center text-sm text-gray-400 mt-auto">
+                        <div className="flex items-center">
+                          <Clock className="w-4 h-4 mr-1" />
+                          {course.duration}
+                        </div>
+                        <div className="flex items-center">
+                          <Book className="w-4 h-4 mr-1" />
+                          {course.lessonCount} lessons
+                        </div>
+                      </div>
+                    </div>
+
+                    {isCompleted ? (
+                      <Link
+                        href={`/courses/${course.id}`}
+                        className="block bg-green-700 hover:bg-green-600 px-5 py-3 text-center text-sm font-medium text-white transition-colors"
+                      >
+                        <div className="flex items-center justify-center">
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Review Course
+                        </div>
+                      </Link>
+                    ) : isRegistered ? (
+                      <Link
+                        href={`/courses/${course.id}`}
+                        className="block bg-blue-700 hover:bg-blue-600 px-5 py-3 text-center text-sm font-medium text-white transition-colors"
+                      >
+                        Continue Learning
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={() => handleCourseRegistration(course.id)}
+                        className="block w-full bg-gray-800 hover:bg-violet-700 px-5 py-3 text-center text-sm font-medium text-white transition-colors"
+                      >
+                        Start Course
+                      </button>
+                    )}
+                  </div>
+                );
+              })
             )}
           </div>
         </div>
       </div>
-
-      {/* Theme toggle button */}
-      <button
-        onClick={() => setDarkMode(!darkMode)}
-        className="fixed right-5 bottom-5 p-3 bg-gray-800 text-white rounded-full shadow-lg"
-      >
-        {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-      </button>
+      <MotivationSection />
+      <Footer />
     </div>
   );
 }
