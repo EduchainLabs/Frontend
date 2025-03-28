@@ -6,6 +6,9 @@ import Navbar from "@/components/Navbar";
 import UnauthenticatedPracticeArena from "@/components/UnauthenticatedPA";
 import PracticePage from "@/components/PracticeArena";
 
+
+
+
 // Main page component with authentication check
 const PracticeArena = () => {
   const { data: session, status } = useSession();

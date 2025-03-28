@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import OCConnectWrapper from "../components/OCConnectWrapper";
-
-const opts = {
-  redirectUri: `${process.env.WEBSITE_URL}/redirect`,
-  referralCode: "", // Your partner code
-};
+import { SessionProvider } from "next-auth/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,21 +15,20 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Web3 Labs",
-  description: "Powered By EDU Chain",
+  description: "Empowering Web3 Explorers",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="en">
       <body
-      suppressHydrationWarning = {true}
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <OCConnectWrapper opts={opts} sandboxMode={true}>
-          {children}
-        </OCConnectWrapper>
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );
