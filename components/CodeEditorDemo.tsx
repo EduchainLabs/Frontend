@@ -53,6 +53,7 @@ contract MyToken {
 
   return (
     <section className="px-6 py-16">
+       
       <div className="max-w-6xl mx-auto">
         <motion.div
           className="text-center mb-12"

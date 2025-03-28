@@ -1,13 +1,82 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+  // const [status, setStatus] = useState({
+  //   message: "",
+  //   type: "", // "success" or "error"
+  //   isSubmitting: false,
+  // });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [status, setStatus] = useState({
+    isSubmitting: false,
+    message: "",
+    type: "", // 'success' or 'error'
+  });
+
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  useEffect(() => {
+    if (status.message) {
+      const timer = setTimeout(() => {
+        setStatus((prevStatus) => ({
+          ...prevStatus,
+          message: "",
+        }));
+      }, 5000); // 5 seconds
+
+      // Clean up timer
+      return () => clearTimeout(timer);
+    }
+  }, [status.message]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus({ isSubmitting: true, message: "", type: "" });
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      // Ensure response is not empty before parsing JSON
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : {};
+
+      if (!response.ok) throw new Error(data.error || "Something went wrong");
+
+      setStatus({
+        isSubmitting: false,
+        message: data.message,
+        type: "success",
+      });
+
+      // Reset form after success
+      setFormData({ name: "", email: "", message: "" });
+    } catch (error: any) {
+      setStatus({ isSubmitting: false, message: error.message, type: "error" });
+    }
+  };
+
   return (
     <footer className="bg-gray-950 border-t border-violet-900/30">
       <div className="max-w-6xl mx-auto px-6 py-5">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="flex justify-between items-start">
           {/* Logo and Description Section */}
           <motion.div
             className="col-span-1 md:col-span-2"
@@ -126,11 +195,17 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link
+                {/* <Link
                   href="/blog"
                   className="text-gray-400 hover:text-violet-400 transition-colors"
                 >
                   Blog
+                </Link> */}
+                <Link
+                  href="/courses"
+                  className="text-gray-400 hover:text-violet-400 transition-colors"
+                >
+                  Courses
                 </Link>
               </li>
               <li>
@@ -145,7 +220,7 @@ const Footer = () => {
           </motion.div>
 
           {/* Resources */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -154,10 +229,10 @@ const Footer = () => {
             <ul className="space-y-1 text-sm">
               <li>
                 <Link
-                  href="/tutorials"
+                  href="/courses"
                   className="text-gray-400 hover:text-violet-400 transition-colors"
                 >
-                  Tutorials
+                  Courses
                 </Link>
               </li>
               <li>
@@ -193,7 +268,7 @@ const Footer = () => {
                 </Link>
               </li>
             </ul>
-          </motion.div>
+          </motion.div> */}
         </div>
 
         {/* Newsletter Subscription */}
@@ -203,59 +278,176 @@ const Footer = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="md:w-1/2 mb-4 md:mb-0">
-              <h3 className="text-base font-bold mb-1">Stay Updated</h3>
-              <p className="text-gray-400 text-sm">
-                Subscribe to our newsletter for the latest blockchain
-                development tips and tutorials.
-              </p>
-            </div>
+          <div className="flex flex-col md:flex-row justify-between items-start gap-6">
             <div className="md:w-1/2">
-              <div className="flex flex-col justify-end sm:flex-row">
-                <input
-                  type="email"
-                  placeholder="Your email address"
-                  className="px-3 py-2 rounded-lg md:rounded-r-none bg-gray-900 border border-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent w-full sm:w-auto mb-2 sm:mb-0 text-sm"
-                />
-                <button className="px-4 py-2 bg-violet-700 hover:bg-violet-600 rounded-lg md:rounded-l-none text-white font-medium transition-colors text-sm">
-                  Subscribe
-                </button>
+              <h3 className="text-base font-bold mb-3">Contact Us</h3>
+              <p className="text-gray-400 text-sm mb-4">
+                Have questions or feedback? Reach out to our team and we'll get
+                back to you as soon as possible.
+              </p>
+              <div className="flex items-center text-sm text-gray-400 mb-2">
+                <svg
+                  className="w-4 h-4 mr-2 text-violet-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+                adityaanandatwork276@gmail.com / rakshabv.work@gmail.com
               </div>
+              <div className="flex items-center text-sm text-gray-400">
+                <svg
+                  className="w-4 h-4 mr-2 text-violet-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                Bengaluru, India
+              </div>
+            </div>
+
+            <div className="md:w-1/2 w-full">
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      placeholder="Your name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent text-sm"
+                      required
+                      disabled={status.isSubmitting}
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      placeholder="Your email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent text-sm"
+                      required
+                      disabled={status.isSubmitting}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <textarea
+                    id="message"
+                    name="message"
+                    placeholder="Your message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-3 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent text-sm"
+                    required
+                    disabled={status.isSubmitting}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className={`px-4 py-2 bg-violet-700 hover:bg-violet-600 rounded-lg text-white font-medium transition-colors text-sm flex items-center justify-center ${
+                    status.isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
+                  disabled={status.isSubmitting}
+                >
+                  {status.isSubmitting ? (
+                    <>
+                      <svg
+                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Sending...
+                    </>
+                  ) : (
+                    "Send Message"
+                  )}
+                </button>
+
+                {status.message && (
+                  <p
+                    className={`text-sm ${
+                      status.type === "success"
+                        ? "text-green-400"
+                        : "text-red-400"
+                    }`}
+                  >
+                    {status.message}
+                  </p>
+                )}
+              </form>
             </div>
           </div>
         </motion.div>
 
         {/* Copyright */}
         <motion.div
-          className="mt-6 text-center"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          className="mt-8 pt-4 border-t border-gray-800 text-center text-gray-500 text-xs"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <p className="text-gray-500 text-xs">
+          <p>
             © {new Date().getFullYear()} Blockchain Lab. All rights reserved.
           </p>
-          <div className="mt-1 flex justify-center space-x-4">
+          {/* <div className="mt-2 flex justify-center space-x-4">
             <Link
               href="/privacy"
-              className="text-gray-500 hover:text-violet-400 text-xs"
+              className="hover:text-violet-400 transition-colors"
             >
               Privacy Policy
             </Link>
             <Link
               href="/terms"
-              className="text-gray-500 hover:text-violet-400 text-xs"
+              className="hover:text-violet-400 transition-colors"
             >
               Terms of Service
             </Link>
-            <Link
-              href="/contact"
-              className="text-gray-500 hover:text-violet-400 text-xs"
-            >
-              Contact Us
-            </Link>
-          </div>
+          </div> */}
         </motion.div>
       </div>
     </footer>
