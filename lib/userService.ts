@@ -33,7 +33,7 @@ export async function createUser(
   initialData?: Partial<UserData>
 ) {
   const client = await clientPromise;
-  const db = client.db("Web3LabsDB");
+  const db = client.db("EduChainLabsDB");
   const usersCollection = db.collection("users");
 
   // Check if user already exists
@@ -77,7 +77,7 @@ export async function updateUserField(
   value: any
 ) {
   const client = await clientPromise;
-  const db = client.db("Web3LabsDB");
+  const db = client.db("EduChainLabsDB");
   const usersCollection = db.collection("users");
 
   // Create update object with the specific field to update
@@ -108,7 +108,7 @@ export async function incrementUserField(
   incrementBy: number = 1
 ) {
   const client = await clientPromise;
-  const db = client.db("Web3LabsDB");
+  const db = client.db("EduChainLabsDB");
   const usersCollection = db.collection("users");
 
   // Create increment object for the specific field
@@ -139,7 +139,7 @@ export async function pushToUserArray(
   value: any
 ) {
   const client = await clientPromise;
-  const db = client.db("Web3LabsDB");
+  const db = client.db("EduChainLabsDB");
   const usersCollection = db.collection("users");
 
   // Create push object for the specific array field

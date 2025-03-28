@@ -12,6 +12,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@monaco-editor/react": "^4.7.0",
+    "@opencampus/ocid-connect-js": "^2.0.0",
     "@tailwindcss/typography": "^0.5.16",
     "dompurify": "^3.2.4",
     "dotenv": "^16.4.7",
@@ -19,6 +20,7 @@
     "heroicons": "^2.2.0",
     "lucide-react": "^0.479.0",
     "marked": "^15.0.7",
+    "monaco-editor": "^0.52.2",
     "mongodb": "^6.14.2",
     "mongoose": "^8.12.2",
     "next": "15.2.1",

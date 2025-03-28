@@ -220,7 +220,7 @@ const HeroSection = () => {
                   </div>
                   <div className="flex-1 bg-gray-800 rounded-md h-5 flex items-center justify-center">
                     <span className="text-gray-400 text-xs">
-                      smart-contract.sol
+                      edu_chain.sol
                     </span>
                   </div>
                 </div>
@@ -243,7 +243,7 @@ const HeroSection = () => {
                       <span className="text-blue-400">solidity</span> ^0.8.0;
                       {"\n\n"}
                       <span className="text-violet-400">contract</span>{" "}
-                      <span className="text-green-400">BlockchainLab</span>{" "}
+                      <span className="text-green-400">EduChainLab</span>{" "}
                       {"{"}
                       {"\n"}
                       {"    "}

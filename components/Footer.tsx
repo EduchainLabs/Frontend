@@ -99,7 +99,7 @@ const Footer = () => {
                   d="M13 10V3L4 14h7v7l9-11h-7z"
                 />
               </svg>
-              <span className="text-lg font-bold">Blockchain Lab</span>
+              <span className="text-lg font-bold">EduChain Labs</span>
             </Link>
             <p className="mt-3 text-gray-400 max-w-md text-sm">
               Empowering developers to build the future of Web3 through

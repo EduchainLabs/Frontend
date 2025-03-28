@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
+import OCConnectWrapper from "@/components/OCConnectWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,12 +24,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
+  const opts = {
+    clientId: "<Does_Not_Matter_For_Sandbox_mode>",
+    redirectUri: `${process.env.WEBSITE_URL}/redirect`, // Adjust this URL
+    referralCode: "PARTNER6", // Assign partner code
+  };
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProvider>{children}</SessionProvider>
+        <OCConnectWrapper opts={opts} sandboxMode={true}>
+          {children}
+        </OCConnectWrapper>
       </body>
     </html>
   );

@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { Metadata } from "next";
 import { useRouter, useSearchParams } from "next/navigation";
 import Head from "next/head";
-import { useSession } from "next-auth/react";
 import { Course, Lesson, ThemeMode } from "@/types/course";
 
 // Import components
@@ -56,7 +55,6 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
   // Use React.use() to unwrap the params Promise
   const router = useRouter();
   const mainContentRef = useRef<HTMLDivElement>(null);
-  const { data: session, status } = useSession();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [course, setCourse] = useState<Course | null>(null);
@@ -78,27 +76,10 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
     course?.lessons.findIndex((l) => l.id === currentLesson?.id) ?? 0;
 
   // Effect to check course completion from API
-  useEffect(() => {
-    const fetchCourseStatus = async () => {
-      if (!session?.user?.email || !courseId) return;
-      
-      try {
-        const response = await fetch(`/api/users/courses?email=${encodeURIComponent(session.user.email)}`);
-        const data = await response.json();
-        
-        if (data.success && data.courses) {
-          const courseData = data.courses.find((c: any) => c.id === courseId);
-          if (courseData) {
-            setCourseCompleted(courseData.completed || false);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch course status:", error);
-      }
-    };
+  const recordCourseCompletion = (() => {
+    console.log("Course completed:", course?.id);
 
-    fetchCourseStatus();
-  }, [courseId, session?.user?.email]);
+  })
 
   useEffect(() => {
     if (course && lessonCompleted) {
@@ -109,9 +90,6 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
       
       // Only update course completion state if all lessons are completed
       // and the API hasn't already marked it as completed
-      if (allLessonsCompleted && !courseCompleted) {
-        recordCourseCompletion();
-      }
     }
   }, [course, lessonCompleted, courseId, courseCompleted]);
 
@@ -201,51 +179,6 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
   };
 
   // Record course completion
-  const recordCourseCompletion = async () => {
-    try {
-      // Get user email from session or auth provider
-      const email = session?.user?.email;
-
-      if (!email) {
-        console.error("User email not found");
-        return;
-      }
-
-      const response = await fetch("/api/users/courses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ 
-          email, 
-          courseId,
-          completed: true 
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        // Update local state to reflect completion
-        setCourseCompleted(true);
-        
-        // Send additional data for user progression tracking
-        await updateUserProgress(email, courseId);
-      }
-    } catch (error) {
-      console.error("Failed to record course completion:", error);
-      setNotification({
-        show: true,
-        message: "Failed to record course completion. Please try again.",
-        type: "error",
-      });
-
-      // Hide notification after 5 seconds
-      setTimeout(() => {
-        setNotification({ show: false, message: "", type: "" });
-      }, 5000);
-    }
-  };
   
   // Update user progress in the course route
   const updateUserProgress = async (email: string, courseId: string) => {
