@@ -1,22 +1,22 @@
 //api/users/profile/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getUserByEmail, updateUserField } from "@/lib/userService";
+import { getUserByOCId, updateUserField } from "@/lib/userService";
 import { calculateAverageAIScore } from "@/utils/userCalculations";
 
 // Get comprehensive user profile data
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
-    const email = url.searchParams.get("email");
+    const OCId = url.searchParams.get("OCId");
 
-    if (!email) {
+    if (!OCId) {
       return NextResponse.json(
-        { success: false, error: "Email parameter is required" },
+        { success: false, error: "OCId parameter is required" },
         { status: 400 }
       );
     }
 
-    const user = await getUserByEmail(email);
+    const user = await getUserByOCId(OCId);
     if (!user) {
       return NextResponse.json(
         { success: false, error: "User not found" },
@@ -59,9 +59,9 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, username, image } = body;
+    const { OCId, ethAddress , image } = body;
 
-    if (!email) {
+    if (!OCId) {
       return NextResponse.json(
         { success: false, error: "Email is required" },
         { status: 400 }
@@ -70,13 +70,13 @@ export async function PATCH(req: NextRequest) {
 
     const updates = [];
 
-    if (username !== undefined) {
-      await updateUserField(email, "username", username);
+    if (ethAddress !== undefined) {
+      await updateUserField(OCId, "ethAddress", ethAddress);
       updates.push("username");
     }
 
     if (image !== undefined) {
-      await updateUserField(email, "image", image);
+      await updateUserField(OCId, "image", image);
       updates.push("image");
     }
 

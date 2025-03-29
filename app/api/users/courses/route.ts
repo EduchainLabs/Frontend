@@ -5,9 +5,9 @@ import clientPromise from "@/lib/mongodb";
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
-    const email = url.searchParams.get("email");
+    const OCId = url.searchParams.get("OCId");
 
-    if (!email) {
+    if (!OCId) {
       return NextResponse.json(
         { success: false, error: "Email parameter is required" },
         { status: 400 }
@@ -15,12 +15,12 @@ export async function GET(req: NextRequest) {
     }
 
     const client = await clientPromise;
-    const db = client.db("Web3LabsDB");
+    const db = client.db("EduChainLabsDB");
     const userCoursesCollection = db.collection("userCourses");
     const coursesCollection = db.collection("courses");
 
     // Get all course IDs the user has registered for
-    const userCourses = await userCoursesCollection.find({ email }).toArray();
+    const userCourses = await userCoursesCollection.find({ OCId }).toArray();
 
     // If user has no courses, return empty array
     if (!userCourses.length) {
@@ -69,11 +69,11 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, courseId, completed } = body;
+    const { OCId , courseId, completed } = body;
 
-    if (!email) {
+    if (!OCId) {
       return NextResponse.json(
-        { success: false, error: "Email is required" },
+        { success: false, error: "OCId is required" },
         { status: 400 }
       );
     }
@@ -86,19 +86,19 @@ export async function POST(req: NextRequest) {
     }
 
     const client = await clientPromise;
-    const db = client.db("Web3LabsDB");
+    const db = client.db("EduChainLabsDB");
     const userCoursesCollection = db.collection("userCourses");
 
     // Check if user already has this course
     const existingUserCourse = await userCoursesCollection.findOne({
-      email,
+      OCId,
       courseId,
     });
 
     if (existingUserCourse) {
       // Update the completion status if the record exists
       await userCoursesCollection.updateOne(
-        { email, courseId },
+        { OCId, courseId },
         { $set: { completed: completed === undefined ? true : completed } }
       );
 
@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
     } else {
       // Create a new record if it doesn't exist
       await userCoursesCollection.insertOne({
-        email,
+        OCId,
         courseId,
         completed: completed === undefined ? true : completed,
         enrolledAt: new Date(),

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   incrementUserField,
   updateUserField,
-  getUserByEmail,
+  getUserByOCId,
   pushToUserArray,
 } from "@/lib/userService";
 import {
@@ -14,11 +14,11 @@ import {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, courseId, course } = body;
+    const { OCId, courseId, course } = body;
 
-    if (!email) {
+    if (!OCId) {
       return NextResponse.json(
-        { success: false, error: "Email is required" },
+        { success: false, error: "OCId is required" },
         { status: 400 }
       );
     }
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Get user data to check if course already completed
-    const user = await getUserByEmail(email);
+    const user = await getUserByOCId(OCId);
 
     if (!user) {
       return NextResponse.json(
@@ -53,15 +53,15 @@ export async function POST(req: NextRequest) {
     if (isNewCompletion) {
       // Update user's completedCourses array
       if (!user.data.completedCourses) {
-        await updateUserField(email, "completedCourses", [
+        await updateUserField(OCId, "completedCourses", [
           { courseId, course },
         ]);
       } else {
-        await pushToUserArray(email, "completedCourses", { courseId, course });
+        await pushToUserArray(OCId, "completedCourses", { courseId, course });
       }
 
       // Increment course completion count
-      await incrementUserField(email, "courseCompleted");
+      await incrementUserField(OCId, "courseCompleted");
 
       // Also update the userCourses collection to mark this course as completed
       try {
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email,
+            OCId,
             courseId,
             completed: true,
           }),
@@ -90,14 +90,14 @@ export async function POST(req: NextRequest) {
       }
 
       // Update user level based on new data
-      const levelResult = await updateUserLevel(email);
+      const levelResult = await updateUserLevel(OCId);
 
       // Get updated user data and check for achievements
-      const updatedUser = await getUserByEmail(email);
+      const updatedUser = await getUserByOCId(OCId);
 
       if (updatedUser) {
         const newAchievements = await checkAndGrantAchievements(
-          email,
+          OCId,
           updatedUser.data
         );
 

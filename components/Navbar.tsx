@@ -12,10 +12,14 @@ const Navbar = () => {
 
   useEffect(() => {
     // Only run when user becomes authenticated
-    if (isInitialized && authState.isAuthenticated && !isCreatingUser) {
+    if (
+      isInitialized &&
+      authState.isAuthenticated &&
+      !isCreatingUser
+    ) {
       createUserAfterLogin();
     }
-  }, [isInitialized, authState.isAuthenticated]);
+  }, [isInitialized]);
 
   const createUserAfterLogin = async () => {
     try {
