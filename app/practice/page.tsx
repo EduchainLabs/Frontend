@@ -1,8 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar";
-import UnauthenticatedPracticeArena from "@/components/UnauthenticatedPA";
+import React from "react";
 import PracticeArena from "@/components/PracticeArena";
 
 
