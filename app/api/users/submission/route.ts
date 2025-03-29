@@ -10,32 +10,32 @@ import {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, isAccepted = false } = body;
+    const { OCId , isAccepted = false } = body;
 
-    if (!email) {
+    if (!OCId) {
       return NextResponse.json(
-        { success: false, error: "Email is required" },
+        { success: false, error: "OCId is required" },
         { status: 400 }
       );
     }
 
     // Increment submission count
-    await incrementUserField(email, "submissions");
+    await incrementUserField(OCId, "submissions");
 
     // Increment accepted submissions if applicable
     if (isAccepted) {
-      await incrementUserField(email, "acceptedSubmissions");
+      await incrementUserField(OCId, "acceptedSubmissions");
     }
 
     // Update user level based on new data
-    const levelResult = await updateUserLevel(email);
+    const levelResult = await updateUserLevel(OCId);
 
     // Get user data and check for achievements
-    const { getUserByEmail } = await import("@/lib/userService");
-    const user = await getUserByEmail(email);
+    const { getUserByOCId } = await import("@/lib/userService");
+    const user = await getUserByOCId(OCId);
 
     if (user) {
-      const newAchievements = await checkAndGrantAchievements(email, user.data);
+      const newAchievements = await checkAndGrantAchievements(OCId, user.data);
 
       return NextResponse.json(
         {

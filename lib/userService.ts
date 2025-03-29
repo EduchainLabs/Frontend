@@ -4,7 +4,8 @@ import clientPromise from "@/lib/mongodb";
 
 // Define User data interface
 export interface UserData {
-  username: string;
+  OCId: string;
+  ethAddress : string;
   image: string;
   completedCourses: { courseId: string; course: any }[];
   courseCompleted: number;
@@ -17,8 +18,9 @@ export interface UserData {
 
 // Default user data
 export const defaultUserData: UserData = {
-  username: "",
+  OCId: "",
   image: "",
+  ethAddress : "",
   completedCourses: [],
   courseCompleted: 0,
   submissions: 0,
@@ -29,7 +31,7 @@ export const defaultUserData: UserData = {
 };
 
 export async function createUser(
-  email: string,
+  OCId: string,
   initialData?: Partial<UserData>
 ) {
   const client = await clientPromise;
@@ -37,7 +39,7 @@ export async function createUser(
   const usersCollection = db.collection("users");
 
   // Check if user already exists
-  const existingUser = await usersCollection.findOne({ email });
+  const existingUser = await usersCollection.findOne({ OCId });
   if (existingUser) {
     return {
       success: false,
@@ -50,7 +52,7 @@ export async function createUser(
   const userData = { ...defaultUserData, ...initialData };
 
   const result = await usersCollection.insertOne({
-    email,
+    OCId,
     data: userData,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -63,16 +65,16 @@ export async function createUser(
   };
 }
 
-export async function getUserByEmail(email: string) {
+export async function getUserByOCId(OCId: string) {
   const client = await clientPromise;
   const db = client.db("Web3LabsDB");
   const usersCollection = db.collection("users");
 
-  return await usersCollection.findOne({ email });
+  return await usersCollection.findOne({ OCId});
 }
 
 export async function updateUserField(
-  email: string,
+  OCId: string,
   fieldPath: string,
   value: any
 ) {
@@ -85,7 +87,7 @@ export async function updateUserField(
   updateObj[`data.${fieldPath}`] = value;
 
   const result = await usersCollection.updateOne(
-    { email },
+    { OCId },
     {
       $set: {
         ...updateObj,
@@ -103,7 +105,7 @@ export async function updateUserField(
 }
 
 export async function incrementUserField(
-  email: string,
+  OCId: string,
   fieldPath: string,
   incrementBy: number = 1
 ) {
@@ -116,7 +118,7 @@ export async function incrementUserField(
   updateObj[`data.${fieldPath}`] = incrementBy;
 
   const result = await usersCollection.updateOne(
-    { email },
+    { OCId },
     {
       $inc: updateObj,
       $set: { updatedAt: new Date() },
@@ -134,7 +136,7 @@ export async function incrementUserField(
 }
 
 export async function pushToUserArray(
-  email: string,
+  OCId: string,
   arrayPath: string,
   value: any
 ) {
@@ -147,7 +149,7 @@ export async function pushToUserArray(
   updateObj[`data.${arrayPath}`] = value;
 
   const result = await usersCollection.updateOne(
-    { email },
+    { OCId },
     {
       $push: updateObj,
       $set: { updatedAt: new Date() },

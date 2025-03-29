@@ -1,6 +1,6 @@
 //api/users/acheivements/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getUserByEmail } from "@/lib/userService";
+import { getUserByOCId } from "@/lib/userService";
 import { checkAndGrantAchievements } from "@/utils/userCalculations";
 import clientPromise from "@/lib/mongodb";
 
@@ -8,16 +8,16 @@ import clientPromise from "@/lib/mongodb";
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
-    const email = url.searchParams.get("email");
+    const OCId = url.searchParams.get("OCId");
 
-    if (!email) {
+    if (!OCId) {
       return NextResponse.json(
         { success: false, error: "Email parameter is required" },
         { status: 400 }
       );
     }
 
-    const user = await getUserByEmail(email);
+    const user = await getUserByOCId(OCId);
     if (!user) {
       return NextResponse.json(
         { success: false, error: "User not found" },
@@ -101,16 +101,16 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email } = body;
+    const { OCId } = body;
 
-    if (!email) {
+    if (!OCId) {
       return NextResponse.json(
         { success: false, error: "Email is required" },
         { status: 400 }
       );
     }
 
-    const user = await getUserByEmail(email);
+    const user = await getUserByOCId(OCId);
     if (!user) {
       return NextResponse.json(
         { success: false, error: "User not found" },
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check for new achievements
-    const newAchievements = await checkAndGrantAchievements(email, user.data);
+    const newAchievements = await checkAndGrantAchievements(OCId, user.data);
 
     return NextResponse.json(
       {

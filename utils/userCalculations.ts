@@ -44,7 +44,7 @@ export function calculateAverageAIScore(aiScores: number[]): number {
 
 // Check and grant achievements
 export async function checkAndGrantAchievements(
-  email: string,
+  OCId: string,
   userData: UserData
 ): Promise<string[]> {
   const newAchievements: string[] = [];
@@ -77,20 +77,20 @@ export async function checkAndGrantAchievements(
 
   // Add new achievements to the user if any were earned
   if (newAchievements.length > 0) {
-    await addAchievementsToUser(email, newAchievements);
+    await addAchievementsToUser(OCId, newAchievements);
   }
 
   return newAchievements;
 }
 
 // Add achievements to user
-async function addAchievementsToUser(email: string, achievements: string[]) {
+async function addAchievementsToUser(OCId: string, achievements: string[]) {
   const client = await clientPromise;
-  const db = client.db("Web3LabsDB");
+  const db = client.db("EduChainLabsDB");
   const usersCollection = db.collection("users");
 
   await usersCollection.updateOne(
-    { email },
+    { OCId },
     {
       $addToSet: { "data.Achievement": { $each: achievements } },
       $set: { updatedAt: new Date() },
@@ -99,13 +99,13 @@ async function addAchievementsToUser(email: string, achievements: string[]) {
 }
 
 // Update user level based on current data
-export async function updateUserLevel(email: string) {
+export async function updateUserLevel(OCId: string) {
   const client = await clientPromise;
-  const db = client.db("Web3LabsDB");
+  const db = client.db("EduChainLabsDB");
   const usersCollection = db.collection("users");
 
   // Get current user data
-  const user = await usersCollection.findOne({ email });
+  const user = await usersCollection.findOne({ OCId });
   if (!user) return { success: false, message: "User not found" };
 
   // Calculate the new level
@@ -114,7 +114,7 @@ export async function updateUserLevel(email: string) {
   // Update the user's level if it has changed
   if (newLevel !== user.data.Level) {
     await usersCollection.updateOne(
-      { email },
+      { OCId },
       {
         $set: {
           "data.Level": newLevel,

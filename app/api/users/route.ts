@@ -1,13 +1,14 @@
+//api/users/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { createUser, getUserByEmail, updateUserField } from "@/lib/userService";
+import { createUser, getUserByOCId, updateUserField } from "@/lib/userService";
 
 // Create new user
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, username, image, ...otherData } = body;
+    const { OCId, ethAddress , image, ...otherData } = body;
 
-    if (!email) {
+    if (!OCId) {
       return NextResponse.json(
         { success: false, error: "Email is required" },
         { status: 400 }
@@ -16,12 +17,12 @@ export async function POST(req: NextRequest) {
 
     // Format the initial data correctly according to your UserData structure
     const initialData = {
-      username: username || "",
+      ethAddress: ethAddress || "",
       image: image || "",
       ...otherData,
     };
 
-    const result = await createUser(email, initialData);
+    const result = await createUser(OCId, initialData);
 
     return NextResponse.json(result, {
       status: result.success ? 200 : 400,
@@ -39,16 +40,16 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
-    const email = url.searchParams.get("email");
+    const OCId = url.searchParams.get("OCId");
 
-    if (!email) {
+    if (!OCId) {
       return NextResponse.json(
-        { success: false, error: "Email parameter is required" },
+        { success: false, error: "OCId parameter is required" },
         { status: 400 }
       );
     }
 
-    const user = await getUserByEmail(email);
+    const user = await getUserByOCId(OCId);
 
     if (!user) {
       return NextResponse.json(

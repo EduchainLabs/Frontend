@@ -1,6 +1,6 @@
 //api/users/ai-score/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { pushToUserArray, getUserByEmail } from "@/lib/userService";
+import { pushToUserArray, getUserByOCId } from "@/lib/userService";
 import {
   updateUserLevel,
   checkAndGrantAchievements,
@@ -10,9 +10,9 @@ import {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, score } = body;
+    const { OCId, score } = body;
 
-    if (!email || score === undefined) {
+    if (!OCId || score === undefined) {
       return NextResponse.json(
         { success: false, error: "Email and score are required" },
         { status: 400 }
@@ -20,10 +20,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Add the AI score to the user's array
-    await pushToUserArray(email, "AI_Scores", score);
+    await pushToUserArray(OCId, "AI_Scores", score);
 
     // Get updated user data
-    const user = await getUserByEmail(email);
+    const user = await getUserByOCId(OCId);
     if (!user) {
       return NextResponse.json(
         { success: false, error: "User not found" },
@@ -35,10 +35,10 @@ export async function POST(req: NextRequest) {
     const averageScore = calculateAverageAIScore(user.data.AI_Scores);
 
     // Update user level based on new data
-    const levelResult = await updateUserLevel(email);
+    const levelResult = await updateUserLevel(OCId);
 
     // Check for new achievements
-    const newAchievements = await checkAndGrantAchievements(email, user.data);
+    const newAchievements = await checkAndGrantAchievements(OCId, user.data);
 
     return NextResponse.json(
       {
@@ -65,16 +65,16 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
-    const email = url.searchParams.get("email");
+    const OCId = url.searchParams.get("OCId");
 
-    if (!email) {
+    if (!OCId) {
       return NextResponse.json(
         { success: false, error: "Email parameter is required" },
         { status: 400 }
       );
     }
 
-    const user = await getUserByEmail(email);
+    const user = await getUserByOCId(OCId);
     if (!user) {
       return NextResponse.json(
         { success: false, error: "User not found" },

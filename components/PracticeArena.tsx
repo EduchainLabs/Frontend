@@ -9,6 +9,7 @@ import CodeEditor from "@/components/CodeEditor";
 import { Toast } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import BackButton from "@/components/BackButton";
+import { useOCAuth } from "@opencampus/ocid-connect-js";
 
 type ProblemLevel = "beginner" | "intermediate" | "advanced";
 type ThemeMode = "dark" | "light";
@@ -26,6 +27,7 @@ interface ValidationResult {
   syntax_correct: boolean;
   compilable_code: boolean;
   error: string;
+  score?: number;
 }
 
 interface SuggestionResult {
@@ -46,6 +48,7 @@ interface UserSubmissionResponse {
 
 export default function PracticeArena() {
   const { toast } = useToast();
+  const { isInitialized, authState, ocAuth } = useOCAuth();
   const [problemLevel, setProblemLevel] = useState<ProblemLevel>("beginner");
   const [problemStatement, setProblemStatement] =
     useState<ProblemStatement | null>(null);
@@ -147,9 +150,8 @@ export default function PracticeArena() {
       setIsLoading(false);
     }
   };
-  useEffect(() => {
-    // fetchProblem(problemLevel);
 
+  useEffect(() => {
     // Ensure body has overflow hidden
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
@@ -192,63 +194,75 @@ export default function PracticeArena() {
       const data = await response.json();
       setValidationResult(data);
       setValidationStatus(data.status ? "valid" : "invalid");
-      const ai_score = Number(data.score);
+      const ai_score = Number(data.score || 0);
 
-      // // Only track submissions if user is authenticated
-      // if (status === "authenticated" && session?.user?.email) {
-      //   // Record the submission with user data
-      //   const submissionResponse = await fetch("/api/users/submission", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({
-      //       email: session.user.email,
-      //       isAccepted: data.status, // Pass whether the submission was accepted
-      //     }),
-      //   });
+      // Only track submissions if user is authenticated with OCID
+      if (isInitialized && authState.isAuthenticated && ocAuth) {
+        const authData = ocAuth.getAuthState();
 
-        // const ai_score_response = await fetch("/api/users/ai-score", {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify({
-        //     email: session.user.email,
-        //     score: ai_score,
-        //   }),
-        // });
+        // Record the submission with OCId
+        const submissionResponse = await fetch("/api/users/submission", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            OCId: authData.OCId,
+            isAccepted: data.status, // Pass whether the submission was accepted
+          }),
+        });
 
-        // const submissionData: UserSubmissionResponse =
-        //   await submissionResponse.json();
+        // Record the AI score
+        const ai_score_response = await fetch("/api/users/ai-score", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            OCId: authData.OCId,
+            score: ai_score,
+          }),
+        });
 
-      //   if (submissionData.success) {
-      //     // Show level up notification if applicable
-      //     if (submissionData.levelUpdated && submissionData.newLevel) {
-      //       toast({
-      //         title: "Level Up!",
-      //         description: `Congratulations! You've reached level ${submissionData.newLevel}!`,
-      //         variant: "default",
-      //         duration: 5000,
-      //       });
-      //     }
+        const submissionData: UserSubmissionResponse =
+          await submissionResponse.json();
 
-      //     // Show achievement notifications if applicable
-      //     if (
-      //       submissionData.newAchievements &&
-      //       submissionData.newAchievements.length > 0
-      //     ) {
-      //       submissionData.newAchievements.forEach((achievement) => {
-      //         toast({
-      //           title: "New Achievement Unlocked!",
-      //           description: achievement,
-      //           variant: "default",
-      //           duration: 5000,
-      //         });
-      //       });
-      //     }
-      //   }
-      // }
+        if (submissionData.success) {
+          // Show level up notification if applicable
+          if (submissionData.levelUpdated && submissionData.newLevel) {
+            toast({
+              title: "Level Up!",
+              description: `Congratulations! You've reached level ${submissionData.newLevel}!`,
+              variant: "default",
+              duration: 5000,
+            });
+          }
+
+          // Show achievement notifications if applicable
+          if (
+            submissionData.newAchievements &&
+            submissionData.newAchievements.length > 0
+          ) {
+            submissionData.newAchievements.forEach((achievement) => {
+              toast({
+                title: "New Achievement Unlocked!",
+                description: achievement,
+                variant: "default",
+                duration: 5000,
+              });
+            });
+          }
+        }
+      } else {
+        // Optional: Show a message encouraging login for progress tracking
+        toast({
+          title: "Sign in to track progress",
+          description:
+            "Connect with OCID to track your progress and achievements",
+          variant: "default",
+          duration: 5000,
+        });
+      }
     } catch (error) {
       console.error("Error validating code:", error);
       setValidationStatus("invalid");
