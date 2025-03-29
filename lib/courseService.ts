@@ -59,13 +59,13 @@ export async function getCourseById(courseId: string) {
   return await coursesCollection.findOne({ id: courseId });
 }
 
-export async function getUserCourses(email: string) {
+export async function getUserCourses(OCId: string) {
   const client = await clientPromise;
   const db = client.db("EduChainLabsDB");
   const userCoursesCollection = db.collection("userCourses");
 
   // Get all course IDs the user has registered for
-  const userCourses = await userCoursesCollection.find({ email }).toArray();
+  const userCourses = await userCoursesCollection.find({ OCId }).toArray();
 
   // If user has no courses, return empty array
   if (!userCourses.length) return [];

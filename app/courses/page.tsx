@@ -18,6 +18,7 @@ import Navbar from "@/components/Navbar";
 import BackButton from "@/components/BackButton";
 import MotivationSection from "@/components/MotivationSection";
 import Footer from "@/components/Footer";
+import { useOCAuth } from "@opencampus/ocid-connect-js";
 
 // Course type definition
 export interface Course {
@@ -33,6 +34,7 @@ export interface Course {
 }
 
 export default function CoursesPage() {
+  const { isInitialized, authState } = useOCAuth();
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userCourses, setUserCourses] = useState<string[]>([]);
@@ -62,6 +64,57 @@ export default function CoursesPage() {
     fetchCourses();
   }, []);
 
+  // In CoursesPage.tsx, update the useEffect for fetching user's courses
+  useEffect(() => {
+    if (isInitialized && authState.isAuthenticated) {
+      // Fetch registered courses using OCId
+      const fetchUserCourses = async () => {
+        try {
+          const response = await fetch(
+            `/api/users/courses?OCId=${authState.OCId}`
+          );
+          if (response.ok) {
+            const data = await response.json();
+            // Extract just the course IDs
+            setUserCourses(data.courses.map((course: any) => course.id));
+
+            // Extract completed courses
+            const completedCourseIds = data.courses
+              .filter((course: any) => course.completed)
+              .map((course: any) => course.id);
+            setCompletedCourses(completedCourseIds);
+          }
+        } catch (error) {
+          console.error("Failed to fetch user courses:", error);
+        }
+      };
+
+      // Fetch user completions directly from user data
+      const fetchCompletedCourses = async () => {
+        try {
+          const response = await fetch(
+            `/api/users/user?OCId=${authState.OCId}`
+          );
+          if (response.ok) {
+            const userData = await response.json();
+            if (userData.data.completedCourses) {
+              // Extract just the course IDs from completedCourses array
+              const completedIds = userData.data.completedCourses.map(
+                (course: any) => course.courseId
+              );
+              setCompletedCourses(completedIds);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to fetch completed courses:", error);
+        }
+      };
+
+      fetchUserCourses();
+      fetchCompletedCourses();
+    }
+  }, [isInitialized, authState]);
+
   // Fetch user's registered courses and completed courses if user is logged in
 
   // Filter courses based on search term and level filter
@@ -88,18 +141,46 @@ export default function CoursesPage() {
         return "text-gray-400 bg-gray-400/20";
     }
   };
-  const handleCourseRegistration = async (courseId: string) => {
-    try {
-      setCourses(
-        courses.map((course) =>
-          course.id === courseId
-            ? { ...course, registrations: course.registrations + 1 }
-            : course
-        )
-      );
 
-      // Navigate to the course page
-      router.push(`/courses/${courseId}`);
+  const handleCourseRegistration = async (courseId: string) => {
+    if (!isInitialized || !authState.isAuthenticated) {
+      // Redirect to login if user is not logged in
+      router.push("/gain-course-access");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/courses/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          OCId: authState.OCId,
+          courseId: courseId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // If successful and it's a new registration, add to user courses
+        if (data.isNewRegistration) {
+          setUserCourses((prev) => [...prev, courseId]);
+
+          // Update the course count in the UI (optional)
+          setCourses(
+            courses.map((course) =>
+              course.id === courseId
+                ? { ...course, registrations: course.registrations + 1 }
+                : course
+            )
+          );
+        }
+
+        // Navigate to the course page
+        router.push(`/courses/${courseId}`);
+      }
     } catch (error) {
       console.error("Failed to register for course:", error);
     }
