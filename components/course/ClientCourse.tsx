@@ -1,8 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { Metadata } from "next";
-import { useRouter, useSearchParams } from "next/navigation";
-import Head from "next/head";
+import { useRouter } from "next/navigation";
 import { Course, Lesson, ThemeMode } from "@/types/course";
 
 // Import components
@@ -17,9 +15,10 @@ import LessonNavigation from "./LessonNavigation";
 import LearningResources from "./LearningResourses";
 import Notification from "./Notification";
 import { ChatbotPopup } from "@/components/ChatbotPopup";
+import CourseCompletion from "./CourseCompletion"; // Import the CourseCompletion component
 
 // Import data
-import { courses } from "@/utils/solidityCourse"; // Import the array
+import { courses } from "@/utils/solidityCourse";
 import {
   problemStatements,
   getInitialCodeTemplate,
@@ -40,7 +39,6 @@ courses.forEach((course) => {
   };
 });
 
-// Inside ClientCourse.tsx
 export type ClientCourseProps = {
   courseId: string;
   lessonId?: string;
@@ -50,9 +48,8 @@ export type Props = {
   params: { id: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
-// Inside ClientCourse.tsx
+
 export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
-  // Use React.use() to unwrap the params Promise
   const router = useRouter();
   const mainContentRef = useRef<HTMLDivElement>(null);
 
@@ -70,16 +67,41 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
     message: "",
     type: "",
   });
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   // Get current lesson index
   const currentLessonIndex =
     course?.lessons.findIndex((l) => l.id === currentLesson?.id) ?? 0;
 
-  // Effect to check course completion from API
-  const recordCourseCompletion = (() => {
+  // Properly implemented recordCourseCompletion function
+  const recordCourseCompletion = async () => {
     console.log("Course completed:", course?.id);
 
-  })
+    // Only proceed if the course exists and user is authenticated
+    if (course && userEmail) {
+      try {
+        // Update user progress via API
+        await updateUserProgress(userEmail, course.id);
+
+        // Update local state
+        setCourseCompleted(true);
+
+        // Show notification
+        setNotification({
+          show: true,
+          message: "Congratulations! You've completed the course.",
+          type: "success",
+        });
+
+        // Hide notification after 5 seconds
+        setTimeout(() => {
+          setNotification({ show: false, message: "", type: "" });
+        }, 5000);
+      } catch (error) {
+        console.error("Failed to record course completion:", error);
+      }
+    }
+  };
 
   useEffect(() => {
     if (course && lessonCompleted) {
@@ -87,9 +109,12 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
       const allLessonsCompleted = course.lessons.every(
         (lesson) => lessonCompleted[lesson.id] === true
       );
-      
+
       // Only update course completion state if all lessons are completed
       // and the API hasn't already marked it as completed
+      if (allLessonsCompleted && !courseCompleted) {
+        setCourseCompleted(true);
+      }
     }
   }, [course, lessonCompleted, courseId, courseCompleted]);
 
@@ -118,6 +143,12 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
     const savedProgress = localStorage.getItem(`course_progress_${courseId}`);
     if (savedProgress) {
       setLessonCompleted(JSON.parse(savedProgress));
+    }
+
+    // Get user email from localStorage or auth state
+    const email = localStorage.getItem("userEmail");
+    if (email) {
+      setUserEmail(email);
     }
   }, [courseId, lessonId]);
 
@@ -178,8 +209,6 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
     }
   };
 
-  // Record course completion
-  
   // Update user progress in the course route
   const updateUserProgress = async (email: string, courseId: string) => {
     try {
@@ -188,10 +217,10 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
-          email, 
+        body: JSON.stringify({
+          email,
           courseId,
-          course
+          course,
         }),
       });
 
@@ -294,6 +323,14 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
           <div className="max-w-3xl mx-auto px-6 py-8 pb-16">
             {/* Course progress */}
             <CourseProgressBar course={course} currentLesson={currentLesson} />
+
+            {/* Display Course Completion component if course is completed */}
+            {courseCompleted && (
+              <CourseCompletion
+                courseId={courseId}
+                metadataIndex={course.index || 0}
+              />
+            )}
 
             {/* Title card */}
             <LessonHeader lesson={currentLesson} />
