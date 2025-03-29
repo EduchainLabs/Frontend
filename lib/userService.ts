@@ -67,7 +67,7 @@ export async function createUser(
 
 export async function getUserByOCId(OCId: string) {
   const client = await clientPromise;
-  const db = client.db("Web3LabsDB");
+  const db = client.db("EduChainLabsDB");
   const usersCollection = db.collection("users");
 
   return await usersCollection.findOne({ OCId});

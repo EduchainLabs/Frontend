@@ -25,7 +25,7 @@ import {
 // Type for profile data
 interface UserProfile {
   username: string;
-  email: string;
+  OCId: string;
   image: string;
   ethAddress: string;
   courseCompleted: number;
@@ -80,6 +80,7 @@ const ProfilePage = () => {
         );
 
         if (!response.ok) {
+            console.log(response);
           throw new Error("Failed to fetch profile data");
         }
 
@@ -310,7 +311,7 @@ const ProfilePage = () => {
 
                 {/* User info */}
                 <h1 className="text-xl font-bold mt-4">
-                  {userProfile.username || authData.ethAddress?.slice(0, 8)}
+                  {userProfile.username || authData.OCId}
                 </h1>
                 <p className="text-gray-400 text-sm">
                   {userProfile.ethAddress && userProfile.ethAddress !== authData.ethAddress && 
