@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
 
     if (!OCId) {
       return NextResponse.json(
-        { success: false, error: "Email parameter is required" },
+        { success: false, error: "OCId parameter is required" },
         { status: 400 }
       );
     }

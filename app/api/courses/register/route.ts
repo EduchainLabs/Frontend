@@ -5,11 +5,11 @@ import clientPromise from "@/lib/mongodb";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, courseId } = body;
+    const { OCId, courseId } = body;
 
-    if (!email || !courseId) {
+    if (!OCId || !courseId) {
       return NextResponse.json(
-        { success: false, error: "Email and courseId are required" },
+        { success: false, error: "OCId and courseId are required" },
         { status: 400 }
       );
     }
@@ -21,14 +21,14 @@ export async function POST(req: NextRequest) {
 
     // Check if the user already registered for this course
     const existingRegistration = await userCoursesCollection.findOne({
-      email,
+      OCId,
       courseId,
     });
 
     if (!existingRegistration) {
       // Create a new registration record
       await userCoursesCollection.insertOne({
-        email,
+        OCId,
         courseId,
         registeredAt: new Date(),
         completed: false,
