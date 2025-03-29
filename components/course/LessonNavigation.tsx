@@ -10,7 +10,6 @@ interface LessonNavigationProps {
   handleLessonChange: (lesson: Lesson) => void;
   recordCourseCompletion: () => void;
   courseCompleted: boolean;
-  
 }
 
 export const LessonNavigation: React.FC<LessonNavigationProps> = ({
@@ -38,7 +37,7 @@ export const LessonNavigation: React.FC<LessonNavigationProps> = ({
 
   const completeCourse = () => {
     recordCourseCompletion();
-    router.push("/courses");
+    // Removed the router.push("/courses") to allow showing CourseCompletion component
   };
 
   return (
@@ -75,8 +74,13 @@ export const LessonNavigation: React.FC<LessonNavigationProps> = ({
           <ChevronLeft className="w-5 h-5 ml-2 rotate-180" />
         </button>
       ) : courseCompleted ? (
-        <button onClick={()=>{router.push("/courses")}} className="px-4 py-2 rounded-lg transition-colors flex items-center ml-auto bg-green-600 hover:bg-green-500 text-white">
-         Explore Courses
+        <button
+          onClick={() => {
+            router.push("/courses");
+          }}
+          className="px-4 py-2 rounded-lg transition-colors flex items-center ml-auto bg-green-600 hover:bg-green-500 text-white"
+        >
+          Explore Courses
         </button>
       ) : (
         <button

@@ -67,42 +67,83 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
     message: "",
     type: "",
   });
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userOCId, setUserOCId] = useState<string | null>(null);
 
   // Get current lesson index
   const currentLessonIndex =
     course?.lessons.findIndex((l) => l.id === currentLesson?.id) ?? 0;
 
   // Properly implemented recordCourseCompletion function
+  // Update the recordCourseCompletion function in ClientCourse.tsx
   const recordCourseCompletion = async () => {
     console.log("Course completed:", course?.id);
 
     // Only proceed if the course exists and user is authenticated
-    if (course && userEmail) {
+    if (course) {
       try {
-        // Update user progress via API
-        await updateUserProgress(userEmail, course.id);
-
-        // Update local state
+        // Set courseCompleted to true immediately for UI feedback
         setCourseCompleted(true);
 
-        // Show notification
-        setNotification({
-          show: true,
-          message: "Congratulations! You've completed the course.",
-          type: "success",
-        });
+        // Only make API call if user is authenticated
+        if (userOCId) {
+          // Update user progress via API
+          const response = await fetch("/api/users/courses", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              OCId: userOCId, // Using userOCId directly
+              courseId: course.id,
+              completed: true,
+            }),
+          });
 
-        // Hide notification after 5 seconds
-        setTimeout(() => {
-          setNotification({ show: false, message: "", type: "" });
-        }, 5000);
+          const data = await response.json();
+
+          if (data.success) {
+            // Show notification
+            setNotification({
+              show: true,
+              message: "Congratulations! You've completed the course.",
+              type: "success",
+            });
+
+            // Hide notification after 5 seconds
+            setTimeout(() => {
+              setNotification({ show: false, message: "", type: "" });
+            }, 5000);
+          } else {
+            console.error("Failed to record course completion:", data.error);
+            setNotification({
+              show: true,
+              message: "Failed to record course completion.",
+              type: "error",
+            });
+          }
+        } else {
+          // Show notification even without API call
+          setNotification({
+            show: true,
+            message: "Congratulations! You've completed the course.",
+            type: "success",
+          });
+
+          // Hide notification after 5 seconds
+          setTimeout(() => {
+            setNotification({ show: false, message: "", type: "" });
+          }, 5000);
+        }
       } catch (error) {
         console.error("Failed to record course completion:", error);
+        setNotification({
+          show: true,
+          message: "Error recording course completion.",
+          type: "error",
+        });
       }
     }
   };
-
   useEffect(() => {
     if (course && lessonCompleted) {
       // Check if all lessons are completed
@@ -113,10 +154,15 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
       // Only update course completion state if all lessons are completed
       // and the API hasn't already marked it as completed
       if (allLessonsCompleted && !courseCompleted) {
-        setCourseCompleted(true);
+        // Automatically record course completion when all lessons are completed
+        if (userOCId) {
+          recordCourseCompletion();
+        } else {
+          setCourseCompleted(true);
+        }
       }
     }
-  }, [course, lessonCompleted, courseId, courseCompleted]);
+  }, [course, lessonCompleted, courseId, courseCompleted, userOCId]);
 
   useEffect(() => {
     // Fetch course data based on the courseId
@@ -146,9 +192,9 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
     }
 
     // Get user email from localStorage or auth state
-    const email = localStorage.getItem("userEmail");
-    if (email) {
-      setUserEmail(email);
+    const ocid = localStorage.getItem("userOCId");
+    if (ocid) {
+      setUserOCId(ocid);
     }
   }, [courseId, lessonId]);
 
@@ -210,7 +256,7 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
   };
 
   // Update user progress in the course route
-  const updateUserProgress = async (email: string, courseId: string) => {
+  const updateUserProgress = async (ocid: string, courseId: string) => {
     try {
       const response = await fetch("/api/users/course", {
         method: "POST",
@@ -218,7 +264,7 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email,
+          OCId: ocid, // Changed from email to OCId
           courseId,
           course,
         }),

@@ -183,7 +183,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
           </p>
           {txHash && (
             <a
-              href={`https://explorer.edu-block.org/tx/${txHash}`}
+              href={`https://edu-chain-testnet.blockscout.com/tx/${txHash}`}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-2 flex items-center text-sm text-violet-400 hover:text-violet-300"
