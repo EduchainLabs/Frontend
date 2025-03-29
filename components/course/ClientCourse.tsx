@@ -16,6 +16,7 @@ import LearningResources from "./LearningResourses";
 import Notification from "./Notification";
 import { ChatbotPopup } from "@/components/ChatbotPopup";
 import CourseCompletion from "./CourseCompletion"; // Import the CourseCompletion component
+import { useOCAuth } from "@opencampus/ocid-connect-js";
 
 // Import data
 import { courses } from "@/utils/solidityCourse";
@@ -68,10 +69,26 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
     type: "",
   });
   const [userOCId, setUserOCId] = useState<string | null>(null);
+  const { isInitialized, authState } = useOCAuth();
 
   // Get current lesson index
   const currentLessonIndex =
     course?.lessons.findIndex((l) => l.id === currentLesson?.id) ?? 0;
+
+  useEffect(() => {
+    // Set OCID from auth state when initialized
+    if (isInitialized && authState.isAuthenticated) {
+      setUserOCId(authState.OCId);
+    }
+
+    // Alternatively, get from localStorage as fallback
+    else {
+      const ocid = localStorage.getItem("userOCId");
+      if (ocid) {
+        setUserOCId(ocid);
+      }
+    }
+  }, [isInitialized, authState]);
 
   // Properly implemented recordCourseCompletion function
   // Update the recordCourseCompletion function in ClientCourse.tsx
@@ -93,7 +110,7 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              OCId: userOCId, // Using userOCId directly
+              OCId: userOCId,
               courseId: course.id,
               completed: true,
             }),
@@ -256,7 +273,7 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
   };
 
   // Update user progress in the course route
-  const updateUserProgress = async (ocid: string, courseId: string) => {
+  const updateUserProgress = async (courseId: string) => {
     try {
       const response = await fetch("/api/users/course", {
         method: "POST",
@@ -264,7 +281,7 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          OCId: ocid, // Changed from email to OCId
+          OCId: userOCId,
           courseId,
           course,
         }),
