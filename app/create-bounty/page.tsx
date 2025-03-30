@@ -15,6 +15,7 @@ import {
   CheckCircle,
   AlertCircle,
 } from "lucide-react";
+import BackButton from "@/components/BackButton";
 
 const CreateChallengePage = () => {
   // Form state
@@ -130,6 +131,7 @@ const CreateChallengePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
+      <BackButton />
       {/* Background styling */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_top_left,_rgba(124,58,237,0.15),transparent_70%)]"></div>
@@ -338,27 +340,27 @@ const CreateChallengePage = () => {
                 </div>
               </div>
 
-              <div className="mb-8">
+              <div className="flex flex-col gap-2 mb-8">
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   <Tag className="w-4 h-4 inline mr-1" />
                   Tags *
                 </label>
-                <div className="flex items-center mb-2">
+                <div className="flex items-center gap-4 mb-2">
                   <input
                     type="text"
                     name="currentTag"
                     value={formData.currentTag}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
-                    className="flex-1 bg-gray-800/60 border border-gray-700 rounded-l-lg py-2.5 px-4 text-white focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-transparent"
+                    className="w-full flex-1 bg-gray-800/60 border border-gray-700 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                     placeholder="e.g., Smart Contract, DeFi, NFT"
                   />
                   <button
                     type="button"
                     onClick={handleAddTag}
-                    className="bg-violet-700 hover:bg-violet-600 text-white px-4 py-2.5 rounded-r-lg transition-colors border border-violet-700"
+                    className="bg-violet-700 hover:bg-violet-600 text-white px-3 py-2.5 rounded-lg transition-colors border border-violet-700"
                   >
-                    <Plus className="w-5 h-5" />
+                    <Plus className="w-6 h-6" />
                   </button>
                 </div>
                 <p className="text-xs text-gray-400 mb-3">
