@@ -62,6 +62,7 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
   const [lessonCompleted, setLessonCompleted] = useState<{
     [key: string]: boolean;
   }>({});
+  const [nftMinted, setNftMinted] = useState(false);
   const [showProblemStatement, setShowProblemStatement] = useState(true);
   const [notification, setNotification] = useState({
     show: false,
@@ -92,6 +93,30 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
 
   // Properly implemented recordCourseCompletion function
   // Update the recordCourseCompletion function in ClientCourse.tsx
+
+  useEffect(() => {
+    const fetchUserCourseData = async () => {
+      if (userOCId && courseId) {
+        try {
+          const response = await fetch(`/api/users/courses?OCId=${userOCId}`);
+          const data = await response.json();
+
+          if (data.success && data.courses) {
+            // Find the current course
+            const userCourse = data.courses.find((c: any) => c.id === courseId);
+            if (userCourse) {
+              // Update NFT minted status
+              setNftMinted(userCourse.nftMinted || false);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to fetch user course data:", error);
+        }
+      }
+    };
+
+    fetchUserCourseData();
+  }, [userOCId, courseId]);
   const recordCourseCompletion = async () => {
     console.log("Course completed:", course?.id);
 
@@ -392,6 +417,7 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
               <CourseCompletion
                 courseId={courseId}
                 metadataIndex={course.index || 0}
+                nftMinted={nftMinted}
               />
             )}
 

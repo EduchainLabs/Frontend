@@ -22,37 +22,27 @@ export async function GET(req: NextRequest) {
     // Get all course IDs the user has registered for
     const userCourses = await userCoursesCollection.find({ OCId }).toArray();
 
-    // If user has no courses, return empty array
     if (!userCourses.length) {
-      return NextResponse.json(
-        {
-          success: true,
-          courses: [],
-        },
-        { status: 200 }
-      );
+      return NextResponse.json({ success: true, courses: [] }, { status: 200 });
     }
 
-    // Get the actual course details
     const courseIds = userCourses.map((uc) => uc.courseId);
     const courses = await coursesCollection
       .find({ id: { $in: courseIds } })
       .toArray();
 
-    // Add completion status to each course
+    // Add completion and NFT mint status to each course
     const coursesWithStatus = courses.map((course) => {
       const userCourse = userCourses.find((uc) => uc.courseId === course.id);
       return {
         ...course,
         completed: userCourse?.completed || false,
+        nftMinted: userCourse?.nftMinted || false,
       };
     });
 
     return NextResponse.json(
-      {
-        success: true,
-        courses: coursesWithStatus,
-      },
+      { success: true, courses: coursesWithStatus },
       { status: 200 }
     );
   } catch (error) {
@@ -64,23 +54,14 @@ export async function GET(req: NextRequest) {
   }
 }
 
-
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { OCId , courseId, completed } = body;
+    const { OCId, courseId, completed, nftMinted } = body;
 
-    if (!OCId) {
+    if (!OCId || !courseId) {
       return NextResponse.json(
-        { success: false, error: "OCId is required" },
-        { status: 400 }
-      );
-    }
-
-    if (!courseId) {
-      return NextResponse.json(
-        { success: false, error: "Course ID is required" },
+        { success: false, error: "OCId and Course ID are required" },
         { status: 400 }
       );
     }
@@ -89,35 +70,41 @@ export async function POST(req: NextRequest) {
     const db = client.db("EduChainLabsDB");
     const userCoursesCollection = db.collection("userCourses");
 
-    // Check if user already has this course
     const existingUserCourse = await userCoursesCollection.findOne({
       OCId,
       courseId,
     });
 
     if (existingUserCourse) {
-      // Update the completion status if the record exists
+      // Update course completion and NFT mint status
       await userCoursesCollection.updateOne(
         { OCId, courseId },
-        { $set: { completed: completed === undefined ? true : completed } }
-      );
-
-      return NextResponse.json(
         {
-          success: true,
-          message: "Course status updated successfully",
-        },
+          $set: {
+            completed:
+              completed === undefined
+                ? existingUserCourse.completed
+                : completed,
+            nftMinted:
+              nftMinted === undefined
+                ? existingUserCourse.nftMinted
+                : nftMinted,
+          },
+        }
+      );
+      return NextResponse.json(
+        { success: true, message: "Course status updated successfully" },
         { status: 200 }
       );
     } else {
-      // Create a new record if it doesn't exist
+      // Create a new record
       await userCoursesCollection.insertOne({
         OCId,
         courseId,
         completed: completed === undefined ? true : completed,
+        nftMinted: nftMinted || false,
         enrolledAt: new Date(),
       });
-
       return NextResponse.json(
         {
           success: true,
@@ -126,6 +113,63 @@ export async function POST(req: NextRequest) {
         { status: 200 }
       );
     }
+  } catch (error) {
+    console.error("MongoDB Error:", error);
+    return NextResponse.json(
+      { success: false, error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+// Function to update NFT minting status
+export async function PATCH(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { OCId, courseId } = body;
+
+    if (!OCId || !courseId) {
+      return NextResponse.json(
+        { success: false, error: "OCId and Course ID are required" },
+        { status: 400 }
+      );
+    }
+
+    const client = await clientPromise;
+    const db = client.db("EduChainLabsDB");
+    const userCoursesCollection = db.collection("userCourses");
+
+    const existingUserCourse = await userCoursesCollection.findOne({
+      OCId,
+      courseId,
+    });
+
+    if (!existingUserCourse) {
+      return NextResponse.json(
+        { success: false, error: "Course not found for this user" },
+        { status: 404 }
+      );
+    }
+
+    if (existingUserCourse.nftMinted) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "NFT has already been minted for this course",
+        },
+        { status: 400 }
+      );
+    }
+
+    await userCoursesCollection.updateOne(
+      { OCId, courseId },
+      { $set: { nftMinted: true } }
+    );
+
+    return NextResponse.json(
+      { success: true, message: "NFT status updated successfully" },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("MongoDB Error:", error);
     return NextResponse.json(
