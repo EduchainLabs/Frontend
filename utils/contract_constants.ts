@@ -108,7 +108,7 @@ export const CONTRACT_ABI = [
       {
         indexed: false,
         internalType: "address",
-        name: "recepient",
+        name: "recipient",
         type: "address",
       },
       {
@@ -182,13 +182,6 @@ export const CONTRACT_ABI = [
     inputs: [{ internalType: "uint256", name: "tokenId", type: "uint256" }],
     name: "getApproved",
     outputs: [{ internalType: "address", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "address", name: "", type: "address" }],
-    name: "hasMinted",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "view",
     type: "function",
   },
@@ -327,4 +320,4 @@ export const CONTRACT_ABI = [
     type: "function",
   },
 ];
-export const CONTRACT_ADDRESS = "0xD20d9FcD2C0429943A29dD437DeB4c18348bb5d8";
+export const CONTRACT_ADDRESS = "0x040fc81296f79B04201aDA2dfb02826e59a99D94";
