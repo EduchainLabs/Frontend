@@ -327,4 +327,4 @@ export const CONTRACT_ABI = [
     type: "function",
   },
 ];
-export const CONTRACT_ADDRESS = "0x0eDc09Fc37fA91a1eEffd8F836CdfD46158fED29";
+export const CONTRACT_ADDRESS = "0xD20d9FcD2C0429943A29dD437DeB4c18348bb5d8";
