@@ -55,7 +55,7 @@ export const courses = [
     tags: ["solidity", "basics"],
     registrations: 0,
     image: "/images/solidity-basics.png",
-    index: 2,
+    index: 0,
     lessons: [
       {
         id: "intro-to-solidity",
