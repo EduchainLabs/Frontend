@@ -332,11 +332,11 @@ const ProfilePage = () => {
                 </div>
                 
                 {/* OCID Connected Badge */}
-                <div className="flex items-center mt-2 bg-violet-900/20 px-3 py-1 rounded-full">
+                {/* <div className="flex items-center mt-2 bg-violet-900/20 px-3 py-1 rounded-full">
                   <span className="text-xs text-violet-300">
                     OCID: {authData.OCId?.slice(0, 10)}...
                   </span>
-                </div>
+                </div> */}
               </div>
 
               {/* User stats */}
