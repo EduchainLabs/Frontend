@@ -63,7 +63,7 @@ export async function PATCH(req: NextRequest) {
 
     if (!OCId) {
       return NextResponse.json(
-        { success: false, error: "Email is required" },
+        { success: false, error: "OCId is required" },
         { status: 400 }
       );
     }

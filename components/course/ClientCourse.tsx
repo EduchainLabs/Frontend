@@ -117,6 +117,7 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
 
     fetchUserCourseData();
   }, [userOCId, courseId]);
+  
   const recordCourseCompletion = async () => {
     console.log("Course completed:", course?.id);
 
@@ -140,6 +141,23 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
               completed: true,
             }),
           });
+
+          const arrayResponse = await fetch("/api/users/course", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              OCId: userOCId,
+              courseId: course.id,
+              course : course,
+            }),
+          });
+
+          const arrayData = await arrayResponse.json();
+          if (arrayData.success) {
+            console.log("Course added in the list")
+          }
 
           const data = await response.json();
 
