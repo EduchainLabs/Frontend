@@ -12,7 +12,7 @@ interface BackButtonProps {
 }
 
 const BackButton: React.FC<BackButtonProps> = ({
-  className = "bg-violet-300 text-violet-900 p-3 rounded-full flex items-center justify-center hover:bg-violet-900/50 transition-colors w-10 h-10 shadow-md",
+  className = "bg-violet-700 text-white p-3 rounded-full flex items-center justify-center hover:bg-violet-600 transition-colors w-10 h-10 shadow-md",
   ariaLabel = "Go back to previous page",
   offset = { bottom: 24, left: 24 },
 }) => {

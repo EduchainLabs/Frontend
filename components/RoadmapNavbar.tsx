@@ -4,6 +4,7 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import LoginButton from "./LoginButton";
 import Logo from "./ui/Mark";
+import { User } from "lucide-react";
 
 const RoadMapNavbar = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -104,11 +105,11 @@ const RoadMapNavbar = () => {
           <div className="flex items-center gap-4">
             <Link
               href="/dashboard"
-              className="font-semibold px-5 py-2 bg-violet-700 hover:bg-violet-600 rounded-md flex gap-2 justify-start items-center text-white/80 transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-violet-500/30"
+              className="font-semibold p-[6px] bg-violet-700 hover:bg-violet-600 border-emerald-400 border-[2.5px] border-dashed rounded-full flex gap-2 justify-center items-center text-white/80 transition-all transform hover:scale-105 hover:border-solid hover:shadow-lg hover:shadow-violet-500/30 duration-1000"
             >
-              Profile
+              <User className="w-5 h-5" />
             </Link>
-            <button className="px-5 py-2 bg-violet-700 hover:bg-violet-600 rounded-md flex gap-2 justify-start items-center text-white/80 transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-violet-500/30">
+            <button className="px-5 py-2 bg-violet-700 rounded-md flex gap-2 justify-start items-center text-white/80 cursor-default">
               <Logo />
               <div>
                 <span className="font-semibold">OCID</span> Connected
