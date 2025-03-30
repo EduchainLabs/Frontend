@@ -56,7 +56,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="absolute top-0 left-0 z-10 flex justify-between items-center px-6 md:px-12 py-4 w-full">
+    <nav className="absolute top-0 left-0 z-20 flex justify-between items-center px-6 md:px-12 py-4 w-full">
       <div className="flex items-center">
         <Link
           href="/"
@@ -92,10 +92,10 @@ const Navbar = () => {
           <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-400 group-hover:w-full transition-all duration-300"></span>
         </Link>
         <Link
-          href="/chatbot"
+          href="/challenges"
           className="text-white hover:text-violet-400 transition-colors relative group"
         >
-          AI Assistant
+          Challenges
           <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-400 group-hover:w-full transition-all duration-300"></span>
         </Link>
       </div>
