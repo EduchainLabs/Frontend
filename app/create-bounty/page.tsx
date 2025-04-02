@@ -16,6 +16,14 @@ import {
   AlertCircle,
 } from "lucide-react";
 import BackButton from "@/components/BackButton";
+import { ethers } from "ethers";
+import { CONTRACT_ABI, CONTRACT_ADDRESS } from "@/utils/contract_constants2";
+
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
 
 const CreateChallengePage = () => {
   // Form state
@@ -46,7 +54,7 @@ const CreateChallengePage = () => {
     },
   };
 
-  const handleChange = (e : any) => {
+  const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -67,27 +75,27 @@ const CreateChallengePage = () => {
     }
   };
 
-  const handleRemoveTag = (tagToRemove : any) => {
+  const handleRemoveTag = (tagToRemove: any) => {
     setFormData((prev) => ({
       ...prev,
       tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }));
   };
 
-  const handleKeyDown = (e : any) => {
+  const handleKeyDown = (e: any) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleAddTag();
     }
   };
 
-  const handleSubmit = async (e : any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError("");
 
     try {
-      // Validate form data
+      // Validate form data (keep your existing validation)
       if (
         !formData.creatorName ||
         !formData.title ||
@@ -112,17 +120,48 @@ const CreateChallengePage = () => {
         throw new Error("Duration must be greater than 0 days");
       }
 
-      // Here you would call the actual contract function
-      // This is a mock implementation
-      console.log("Creating challenge with data:", formData);
+      // Check if Ethereum is available
+      if (!window.ethereum) {
+        throw new Error(
+          "Ethereum wallet not detected. Please install MetaMask."
+        );
+      }
 
-      // Simulate blockchain transaction delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Connect to the wallet
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = await provider.getSigner();
+
+      // Create contract instance
+      const contract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        CONTRACT_ABI,
+        signer
+      );
+
+      // Convert bounty amount to wei (assuming the input is in ETH)
+      const bountyAmountWei = ethers.parseEther(formData.bountyAmount);
+
+      // Call the createChallenge function
+      const tx = await contract.createChallenge(
+        formData.title,
+        formData.description,
+        formData.requirements,
+        bountyAmountWei,
+        parseInt(formData.durationInDays),
+        { value: bountyAmountWei } // Send ETH with the transaction
+      );
+
+      console.log("Transaction submitted:", tx.hash);
+
+      // Wait for transaction to be mined
+      await tx.wait();
+      console.log("Transaction confirmed");
 
       // Success!
       setFormSubmitted(true);
-    } catch (err : any) {
-      setError(err.message || "Failed to create challenge. Please try again.");
+    } catch (err) {
+      setError("Failed to create challenge. Please try again.");
       console.error(err);
     } finally {
       setIsSubmitting(false);
@@ -310,8 +349,8 @@ const CreateChallengePage = () => {
                       name="bountyAmount"
                       value={formData.bountyAmount}
                       onChange={handleChange}
-                      step="0.01"
                       min="0"
+                      step="any"
                       className="w-full bg-gray-800/60 border border-gray-700 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                       placeholder="Amount in ETH"
                       required
