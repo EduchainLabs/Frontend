@@ -142,7 +142,7 @@ const EarlyAccessPage = () => {
                   <span className="text-green-400">joinWaitlist</span>(
                   <span className="text-orange-400">userData</span>) {"{"}
                   <span className="text-blue-400"> await </span>
-                  <span className="text-green-400">blockchain</span>.
+                  <span className="text-green-400">EduChain</span>.
                   <span className="text-green-400">labs</span>.
                   <span className="text-green-400">register</span>(userData);
                   {"}"}
