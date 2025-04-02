@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
@@ -19,21 +19,67 @@ import {
   Filter,
   AlertTriangle,
 } from "lucide-react";
-import {
-  Status,
-  dummyChallenges,
-  dummyActiveChallengesCount,
-  dummyTotalBountyAmount,
-  dummyTotalSubmissions,
-} from "@/lib/dummyData";
+import { ethers } from "ethers";
+import { CONTRACT_ABI, CONTRACT_ADDRESS } from "@/utils/contract_constants2";
+
+interface ChallengeSummary {
+  challengeId: number;
+  creatorName: string;
+  title: string;
+  description: string;
+  bountyAmount: string;
+  challengeStatus: number;
+  submissionsCount: number;
+  startTime: number;
+  duration: number;
+  tags: string[];
+}
+
+// Define window.ethereum
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
+
+enum Status {
+  waiting = 0,
+  completed = 1,
+  cancelled = 2,
+  expired = 3,
+}
 
 const CompetitionsPage = () => {
   const [filter, setFilter] = useState<Status | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const challenges = dummyChallenges;
+  const [challenges, setChallenges] = useState<ChallengeSummary[]>([]);
+  const [totalBountyAmount, setTotalBountyAmount] = useState<string>("0");
+  const [activeChallengesCount, setActiveChallengesCount] = useState<number>(0);
+  const [totalSubmissions, setTotalSubmissions] = useState<number>(0);
+
+  // Filter challenges based on status and search query
+  const filteredChallenges = challenges.filter((challenge) => {
+    // Filter by status
+    const statusFilter =
+      filter === "all" || challenge.challengeStatus === filter;
+
+    // Filter by search query
+    const searchFilter =
+      searchQuery === "" ||
+      challenge.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      challenge.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      challenge.tags.some((tag) =>
+        tag.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+    return statusFilter && searchFilter;
+  });
 
   // Calculate time remaining for challenge
-  const calculateTimeRemaining = (startTime: number, duration: number) => {
+  const calculateTimeRemaining = (
+    startTime: number,
+    duration: number
+  ): string => {
     const now = Math.floor(Date.now() / 1000);
     const endTime = startTime + duration;
     const remainingSeconds = endTime - now;
@@ -44,18 +90,64 @@ const CompetitionsPage = () => {
     return days > 0 ? `${days} days left` : "Less than a day";
   };
 
-  const filteredChallenges = challenges
-    .filter(
-      (challenge) => filter === "all" || challenge.challengeStatus === filter
-    )
-    .filter(
-      (challenge) =>
-        challenge.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        challenge.description
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        challenge.creatorName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+  useEffect(() => {
+    const fetchChallenges = async () => {
+      try {
+        // Check if Ethereum is available
+        if (typeof window.ethereum !== "undefined") {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const contract = new ethers.Contract(
+            CONTRACT_ADDRESS,
+            CONTRACT_ABI,
+            provider
+          );
+
+          // Get active challenges
+          const activeChallenges = await contract.getActiveChallenges();
+          let challengesArray: ChallengeSummary[] = [];
+          let totalBounty = 0;
+
+          for (let i = 0; i < activeChallenges.length; i++) {
+            const challenge = activeChallenges[i];
+            const remainingTime = await contract.getChallengeRemainingTime(
+              challenge.challengeId
+            );
+
+            // Convert challenge data to match your UI format
+            challengesArray.push({
+              challengeId: Number(challenge.challengeId),
+              creatorName:
+                challenge.creator.substring(0, 6) +
+                "..." +
+                challenge.creator.substring(38),
+              title: challenge.title,
+              description: challenge.description,
+              bountyAmount: ethers.formatEther(challenge.bountyAmount),
+              challengeStatus: Number(challenge.challengeStatus),
+              submissionsCount: Number(challenge.submissionsCount),
+              startTime: Number(challenge.startTime),
+              duration: Number(challenge.duration),
+              tags: ["Blockchain", "Smart Contract"], // You may need to adapt this based on your data structure
+            });
+
+            totalBounty += Number(ethers.formatEther(challenge.bountyAmount));
+          }
+
+          setChallenges(challengesArray);
+          setTotalBountyAmount(totalBounty.toFixed(2));
+          setActiveChallengesCount(challengesArray.length);
+
+          // Get total submissions count
+          const submissionsCount = await contract.totalSubmissionsCount();
+          setTotalSubmissions(Number(submissionsCount));
+        }
+      } catch (error) {
+        console.error("Error fetching challenges:", error);
+      }
+    };
+
+    fetchChallenges();
+  }, []);
 
   const getStatusIcon = (status: Status) => {
     switch (status) {
@@ -98,7 +190,7 @@ const CompetitionsPage = () => {
       case Status.expired:
         return "Expired";
       default:
-        return status;
+        return "Unknown";
     }
   };
 
@@ -182,7 +274,7 @@ const CompetitionsPage = () => {
               <div>
                 <p className="text-gray-400 text-sm">Total Bounties</p>
                 <h3 className="text-2xl font-bold text-white">
-                  ${dummyTotalBountyAmount}
+                  ${totalBountyAmount}
                 </h3>
               </div>
             </div>
@@ -193,7 +285,7 @@ const CompetitionsPage = () => {
               <div>
                 <p className="text-gray-400 text-sm">Active Challenges</p>
                 <h3 className="text-2xl font-bold text-white">
-                  {dummyActiveChallengesCount}
+                  {activeChallengesCount}
                 </h3>
               </div>
             </div>
@@ -204,7 +296,7 @@ const CompetitionsPage = () => {
               <div>
                 <p className="text-gray-400 text-sm">Total Submissions</p>
                 <h3 className="text-2xl font-bold text-white">
-                  {dummyTotalSubmissions}+
+                  {totalSubmissions}+
                 </h3>
               </div>
             </div>
@@ -278,30 +370,6 @@ const CompetitionsPage = () => {
             </Link>
           </motion.div>
 
-          {/* Challenge categories - using actual tags from data */}
-          <motion.div
-            className="flex flex-wrap gap-2 mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            <div className="text-sm text-gray-400 mr-2 flex items-center">
-              <TrendingUp className="w-4 h-4 mr-1" /> Popular tags:
-            </div>
-            {Array.from(
-              new Set(challenges.flatMap((challenge) => challenge.tags))
-            )
-              .slice(0, 6)
-              .map((tag) => (
-                <button
-                  key={tag}
-                  className="px-3 py-1 text-xs bg-gray-800/80 hover:bg-violet-900/30 text-gray-300 hover:text-violet-300 rounded-full transition-colors border border-gray-700/50 hover:border-violet-700/50"
-                >
-                  {tag}
-                </button>
-              ))}
-          </motion.div>
-
           {/* Challenge cards with improved design */}
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -309,7 +377,7 @@ const CompetitionsPage = () => {
             initial="hidden"
             animate="show"
           >
-            {filteredChallenges.map((challenge) => (
+            {filteredChallenges.map((challenge: ChallengeSummary) => (
               <motion.div
                 key={challenge.challengeId}
                 variants={item}
@@ -321,11 +389,11 @@ const CompetitionsPage = () => {
                   <div className="flex justify-between items-start mb-4">
                     <div
                       className={`text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5 ${getStatusColor(
-                        challenge.challengeStatus
+                        challenge.challengeStatus as Status
                       )}`}
                     >
-                      {getStatusIcon(challenge.challengeStatus)}
-                      {getStatusText(challenge.challengeStatus)}
+                      {getStatusIcon(challenge.challengeStatus as Status)}
+                      {getStatusText(challenge.challengeStatus as Status)}
                     </div>
                     <div className="flex items-center text-violet-400 font-medium">
                       <DollarSign className="w-4 h-4 mr-1" />
@@ -358,9 +426,9 @@ const CompetitionsPage = () => {
                     <div className="flex items-center text-xs text-gray-400">
                       <Zap className="w-3 h-3 mr-1.5 text-gray-500" />
                       <span>
-                        {challenge.bountyAmount > 1500
+                        {Number(challenge.bountyAmount) > 1500
                           ? "Advanced"
-                          : challenge.bountyAmount > 500
+                          : Number(challenge.bountyAmount) > 500
                           ? "Intermediate"
                           : "Beginner"}
                       </span>
@@ -369,18 +437,6 @@ const CompetitionsPage = () => {
                       <Code className="w-3 h-3 mr-1.5 text-gray-500" />
                       <span>{challenge.tags[0] || "Blockchain"}</span>
                     </div>
-                  </div>
-
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {challenge.tags.slice(0, 2).map((tag) => (
-                      <span
-                        key={`${challenge.challengeId}-${tag}`}
-                        className="inline-block px-2 py-0.5 text-xs bg-violet-900/20 text-violet-400 rounded-md border border-violet-800/40"
-                      >
-                        {tag}
-                      </span>
-                    ))}
                   </div>
                 </div>
 
@@ -443,7 +499,7 @@ const CompetitionsPage = () => {
           )}
 
           {/* Call to action section */}
-          {filteredChallenges.length > 0 && (
+          {/* {filteredChallenges.length > 0 && (
             <motion.div
               className="mt-16 flex flex-col items-center"
               initial={{ opacity: 0, y: 20 }}
@@ -451,7 +507,7 @@ const CompetitionsPage = () => {
               transition={{ duration: 0.6, delay: 0.6 }}
             >
               <div className="bg-gray-900/60 backdrop-blur p-8 rounded-xl border border-violet-900/50 max-w-3xl mx-auto text-center relative overflow-hidden">
-                {/* Background glow effect */}
+
                 <div className="absolute -top-10 -right-10 w-40 h-40 bg-violet-600 rounded-full filter blur-3xl opacity-20"></div>
                 <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-violet-600 rounded-full filter blur-3xl opacity-20"></div>
 
@@ -484,7 +540,7 @@ const CompetitionsPage = () => {
                 </div>
               </div>
             </motion.div>
-          )}
+          )} */}
         </div>
       </div>
 
