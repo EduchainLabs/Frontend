@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import Editor from "@monaco-editor/react";
 import {
   Moon,
@@ -17,7 +17,8 @@ import {
   Tag,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { dummyChallenges, Status } from "@/lib/dummyData";
+import { ethers } from "ethers";
+import { CONTRACT_ABI, CONTRACT_ADDRESS } from "@/utils/contract_constants2";
 
 interface Challenge {
   challengeId: number;
@@ -44,6 +45,19 @@ interface ValidationResult {
   syntax_correct: boolean;
   compilable_code: boolean;
   error: string;
+}
+
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
+
+enum Status {
+  waiting = 0,
+  completed = 1,
+  cancelled = 2,
+  expired = 3,
 }
 
 export default function ChallengePage() {
@@ -101,39 +115,104 @@ export default function ChallengePage() {
   useEffect(() => {
     if (!challengeId) return;
 
-    // Simulate fetching challenge data from API
-    setIsLoading(true);
-    setTimeout(() => {
-      const foundChallenge = dummyChallenges.find(
-        (c) => c.challengeId === parseInt(challengeId)
-      );
+    const fetchChallengeData = async () => {
+      setIsLoading(true);
+      try {
+        // Check if Ethereum is available
+        if (typeof window.ethereum !== "undefined") {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const contract = new ethers.Contract(
+            CONTRACT_ADDRESS,
+            CONTRACT_ABI,
+            provider
+          );
 
-      if (foundChallenge) {
-        setChallenge(foundChallenge);
+          // Get challenge data
+          const challengeData = await contract.challenges(
+            parseInt(challengeId)
+          );
+
+          // Get remaining time
+          const remainingTime = await contract.getChallengeRemainingTime(
+            parseInt(challengeId)
+          );
+
+          // Check if this is a valid challenge
+          if (challengeData.challengeId.toString() === "0") {
+            setIsLoading(false);
+            return; // Challenge not found
+          }
+
+          // Convert challenge data to match your UI format
+          const formattedChallenge = {
+            challengeId: Number(challengeData.challengeId),
+            creator: challengeData.creator,
+            creatorName: `${challengeData.creator.substring(
+              0,
+              6
+            )}...${challengeData.creator.substring(38)}`,
+            bountyAmount: Number(
+              ethers.formatEther(challengeData.bountyAmount)
+            ),
+            title: challengeData.title,
+            description: challengeData.description,
+            problemStatement: "", // You might need to adjust your contract to include this
+            requirements: challengeData.requirements,
+            tags: ["Blockchain", "Smart Contract"], // You may need to adapt this
+            challengeStatus: Number(challengeData.challengeStatus),
+            submissionsCount: Number(challengeData.submissionsCount),
+            startTime: Number(challengeData.startTime),
+            duration: Number(challengeData.duration),
+            winner: challengeData.winner,
+          };
+
+          setChallenge(formattedChallenge);
+        }
+      } catch (error) {
+        console.error("Error fetching challenge:", error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    }, 1000);
+    };
+
+    fetchChallengeData();
   }, [challengeId]);
 
   useEffect(() => {
     // Update time remaining for active challenges
     if (!challenge) return;
 
-    const updateTimeRemaining = () => {
-      const now = Math.floor(Date.now() / 1000);
-      const endTime = challenge.startTime + challenge.duration;
-      const secondsRemaining = endTime - now;
+    const updateTimeRemaining = async () => {
+      try {
+        if (typeof window.ethereum !== "undefined") {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const contract = new ethers.Contract(
+            CONTRACT_ADDRESS,
+            CONTRACT_ABI,
+            provider
+          );
 
-      if (secondsRemaining <= 0) {
-        setTimeRemaining("Ended");
-        return;
+          // Get remaining time directly from the contract
+          const remainingTimeSeconds = await contract.getChallengeRemainingTime(
+            challenge.challengeId
+          );
+
+          if (remainingTimeSeconds <= 0) {
+            setTimeRemaining("Ended");
+            return;
+          }
+
+          const days = Math.floor(remainingTimeSeconds / (24 * 60 * 60));
+          const hours = Math.floor(
+            (remainingTimeSeconds % (24 * 60 * 60)) / (60 * 60)
+          );
+          const minutes = Math.floor((remainingTimeSeconds % (60 * 60)) / 60);
+
+          setTimeRemaining(`${days}d ${hours}h ${minutes}m remaining`);
+        }
+      } catch (error) {
+        console.error("Error updating time remaining:", error);
       }
-
-      const days = Math.floor(secondsRemaining / (24 * 60 * 60));
-      const hours = Math.floor((secondsRemaining % (24 * 60 * 60)) / (60 * 60));
-      const minutes = Math.floor((secondsRemaining % (60 * 60)) / 60);
-
-      setTimeRemaining(`${days}d ${hours}h ${minutes}m remaining`);
     };
 
     updateTimeRemaining();
@@ -352,7 +431,6 @@ export default function ChallengePage() {
     }
   };
 
-  
   const validateCode = async () => {
     if (!challenge) return;
 
@@ -365,7 +443,7 @@ export default function ChallengePage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          problem_statement: JSON.stringify(challenge.problemStatement + challenge.requirements ),
+          problem_statement: JSON.stringify(challenge.requirements),
           code,
         }),
       });
@@ -379,12 +457,40 @@ export default function ChallengePage() {
     }
   };
 
-  const submitSolution = () => {
+  const submitSolution = async () => {
     if (!challenge || validationStatus !== "valid") return;
 
-    // Add submission logic here
-    alert("Solution submitted successfully!");
-    router.push("/dashboard");
+    try {
+      if (typeof window.ethereum !== "undefined") {
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const contract = new ethers.Contract(
+          CONTRACT_ADDRESS,
+          CONTRACT_ABI,
+          signer
+        );
+
+        // Create a hash of the solution
+        const solutionHash = ethers.keccak256(ethers.toUtf8Bytes(code));
+
+        // Submit solution to the contract
+        const tx = await contract.submitSolution(
+          challenge.challengeId,
+          solutionHash
+        );
+
+        // Wait for transaction to be mined
+        await tx.wait();
+
+        // Show success message
+        alert("Solution submitted successfully to the blockchain!");
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      console.error("Error submitting solution:", error);
+      alert(`Failed to submit solution: ${error}`);
+    }
   };
 
   const formatAddress = (address: string) => {

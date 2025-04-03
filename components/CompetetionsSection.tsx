@@ -455,7 +455,7 @@ const CompetitionsPage = () => {
                   </div>
 
                   <Link
-                    href={`/challenge/${challenge.challengeId}`}
+                    href={`/challenges/${challenge.challengeId}`}
                     className="text-violet-400 text-sm font-medium hover:text-violet-300 transition-colors flex items-center"
                   >
                     View Details
