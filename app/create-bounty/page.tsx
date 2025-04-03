@@ -149,7 +149,7 @@ const CreateChallengePage = () => {
         formData.requirements,
         bountyAmountWei,
         parseInt(formData.durationInDays),
-        { value: bountyAmountWei } // Send ETH with the transaction
+        { value: bountyAmountWei } // Send EDU with the transaction
       );
 
       console.log("Transaction submitted:", tx.hash);

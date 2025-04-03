@@ -397,7 +397,7 @@ const CompetitionsPage = () => {
                     </div>
                     <div className="flex items-center text-violet-400 font-medium">
                       <DollarSign className="w-4 h-4 mr-1" />
-                      {challenge.bountyAmount} ETH
+                      {challenge.bountyAmount} EDU
                     </div>
                   </div>
 

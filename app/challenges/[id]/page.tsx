@@ -650,7 +650,7 @@ export default function ChallengePage() {
 
                             <div className="flex items-center gap-1">
                               <Award size={16} />
-                              <span>{challenge.bountyAmount} ETH Bounty</span>
+                              <span>{challenge.bountyAmount} EDU Bounty</span>
                             </div>
 
                             <div className="flex items-center gap-1">
