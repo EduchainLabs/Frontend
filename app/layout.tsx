@@ -25,8 +25,7 @@ export default function RootLayout({
 }>) {
   const opts = {
     clientId: "<Does_Not_Matter_For_Sandbox_mode>",
-    redirectUri: `${process.env.WEBSITE_URL}/redirect`, // Adjust this URL
-    referralCode: "PARTNER6", // Assign partner code
+    redirectUri: `${process.env.WEBSITE_URL}/redirect`
   };
 
   return (

@@ -98,6 +98,7 @@ const CompetitionsPage = () => {
         // Check if Ethereum is available
         if (typeof window.ethereum !== "undefined") {
           const provider = new ethers.BrowserProvider(window.ethereum);
+          await provider.send("eth_requestAccounts", []);
           const contract = new ethers.Contract(
             CONTRACT_ADDRESS,
             CONTRACT_ABI,
