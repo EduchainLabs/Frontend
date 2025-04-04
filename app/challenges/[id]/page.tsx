@@ -28,7 +28,6 @@ interface Challenge {
   bountyAmount: number;
   title: string;
   description: string;
-  problemStatement: string;
   requirements: string;
   tags: string[];
   challengeStatus: Status;
@@ -157,7 +156,6 @@ export default function ChallengePage() {
             ),
             title: challengeData.title,
             description: challengeData.description,
-            problemStatement: "", // You might need to adjust your contract to include this
             requirements: challengeData.requirements,
             tags: ["Blockchain", "Smart Contract"], // You may need to adapt this
             challengeStatus: Number(challengeData.challengeStatus),
@@ -166,7 +164,8 @@ export default function ChallengePage() {
             duration: Number(challengeData.duration),
             winner: challengeData.winner,
           };
-
+          
+          console.log(challengeData)
           setChallenge(formattedChallenge);
         }
       } catch (error) {
@@ -239,7 +238,7 @@ export default function ChallengePage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          problem_statement: JSON.stringify(challenge.requirements),
+          problem_statement: JSON.stringify("Description : " + challenge.description + "\n Requirements :" + challenge.requirements),
           code,
         }),
       });
@@ -468,18 +467,6 @@ export default function ChallengePage() {
                           </h2>
                           <p style={{ color: colors.textSecondary }}>
                             {challenge.description}
-                          </p>
-                        </div>
-
-                        <div>
-                          <h2
-                            className="text-lg font-semibold mb-2"
-                            style={{ color: colors.textPrimary }}
-                          >
-                            Problem Statement
-                          </h2>
-                          <p style={{ color: colors.textSecondary }}>
-                            {challenge.problemStatement}
                           </p>
                         </div>
 

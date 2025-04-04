@@ -302,26 +302,12 @@ const CreateChallengePage = () => {
                   onChange={handleChange}
                   rows={3}
                   className="w-full bg-gray-800/60 border border-gray-700 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-transparent"
-                  placeholder="A short summary of your challenge (displayed in challenge cards)"
+                  placeholder="A short summary of your challenge (displayed in challenge cards) which clearly explains the problem statement"
                   required
                 ></textarea>
               </div>
 
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  <FileText className="w-4 h-4 inline mr-1" />
-                  Detailed Problem Statement *
-                </label>
-                <textarea
-                  name="problemStatement"
-                  value={formData.problemStatement}
-                  onChange={handleChange}
-                  rows={5}
-                  className="w-full bg-gray-800/60 border border-gray-700 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-transparent"
-                  placeholder="Describe the problem in detail. What are you trying to accomplish? What are the existing issues?"
-                  required
-                ></textarea>
-              </div>
+              
 
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -333,7 +319,7 @@ const CreateChallengePage = () => {
                   onChange={handleChange}
                   rows={5}
                   className="w-full bg-gray-800/60 border border-gray-700 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-transparent"
-                  placeholder="List technical specifications, constraints, and acceptance criteria"
+                  placeholder="List technical specifications, constraints, and acceptance criteria ( Please Make Sure to not use numbers or emojis in this field use commas ',' to seperate the requirements )"
                   required
                 ></textarea>
               </div>
@@ -342,7 +328,7 @@ const CreateChallengePage = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     <DollarSign className="w-4 h-4 inline mr-1" />
-                    Bounty Amount (ETH) *
+                    Bounty Amount (EDU) *
                   </label>
                   <div className="relative">
                     <input
@@ -353,7 +339,7 @@ const CreateChallengePage = () => {
                       min="0"
                       step="any"
                       className="w-full bg-gray-800/60 border border-gray-700 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-transparent"
-                      placeholder="Amount in ETH"
+                      placeholder="Amount in EDU"
                       required
                     />
                   </div>

@@ -412,20 +412,20 @@ const CompetitionsPage = () => {
                   <p className="text-gray-300 text-sm mb-4 line-clamp-3">
                     {challenge.description}
                   </p>
-                  {challenge.requirements && (
+                  {/* {challenge.requirements && (
                     <div className="mt-2">
                       <p className="text-xs font-medium text-gray-400">
                         Requirements:
                       </p>
-                      <p className="text-gray-300 text-sm line-clamp-2">
+                      <p className="text-gray-300 text-sm line-clamp-2 mb-2">
                         {challenge.requirements}
                       </p>
                     </div>
-                  )}
+                  )} */}
                   {challenge.winner &&
                     challenge.winner !==
                       "0x0000000000000000000000000000000000000000" && (
-                      <div className="mt-2 flex items-center text-xs text-green-400">
+                      <div className="mt-2 flex items-center text-xs text-green-400 mb-2">
                         <Award className="w-3 h-3 mr-1.5" />
                         <span>
                           Winner:{" "}
