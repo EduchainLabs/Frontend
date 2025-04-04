@@ -312,9 +312,7 @@ const Footer = () => {
                 />
               </svg>
               <span className="break-all">
-                adityaanandatwork276@gmail.com
-                <br />
-                rakshabv.work@gmail.com
+                educhainlabs@gmail.com
               </span>
             </div>
             <div className="flex items-center text-sm text-gray-400 mb-4">
