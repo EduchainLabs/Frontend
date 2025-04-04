@@ -27,12 +27,14 @@ interface ChallengeSummary {
   creatorName: string;
   title: string;
   description: string;
+  requirements: string; // Add this field
   bountyAmount: string;
   challengeStatus: number;
   submissionsCount: number;
   startTime: number;
   duration: number;
   tags: string[];
+  winner: string; // Add this field
 }
 
 // Define window.ethereum
@@ -122,12 +124,14 @@ const CompetitionsPage = () => {
                 challenge.creator.substring(38),
               title: challenge.title,
               description: challenge.description,
+              requirements: challenge.requirements, // Add this field
               bountyAmount: ethers.formatEther(challenge.bountyAmount),
               challengeStatus: Number(challenge.challengeStatus),
               submissionsCount: Number(challenge.submissionsCount),
               startTime: Number(challenge.startTime),
               duration: Number(challenge.duration),
-              tags: ["Blockchain", "Smart Contract"], // You may need to adapt this based on your data structure
+              winner: challenge.winner, // Add this field
+              tags: challenge.tags || ["Blockchain", "Smart Contract"], // Use actual tags from contract
             });
 
             totalBounty += Number(ethers.formatEther(challenge.bountyAmount));
@@ -407,6 +411,29 @@ const CompetitionsPage = () => {
                   <p className="text-gray-300 text-sm mb-4 line-clamp-3">
                     {challenge.description}
                   </p>
+                  {challenge.requirements && (
+                    <div className="mt-2">
+                      <p className="text-xs font-medium text-gray-400">
+                        Requirements:
+                      </p>
+                      <p className="text-gray-300 text-sm line-clamp-2">
+                        {challenge.requirements}
+                      </p>
+                    </div>
+                  )}
+                  {challenge.winner &&
+                    challenge.winner !==
+                      "0x0000000000000000000000000000000000000000" && (
+                      <div className="mt-2 flex items-center text-xs text-green-400">
+                        <Award className="w-3 h-3 mr-1.5" />
+                        <span>
+                          Winner:{" "}
+                          {challenge.winner.substring(0, 6) +
+                            "..." +
+                            challenge.winner.substring(38)}
+                        </span>
+                      </div>
+                    )}
 
                   {/* Challenge attributes */}
                   <div className="grid grid-cols-2 gap-3 mb-4">

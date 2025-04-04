@@ -147,6 +147,7 @@ const CreateChallengePage = () => {
         formData.title,
         formData.description,
         formData.requirements,
+        formData.tags,
         bountyAmountWei,
         parseInt(formData.durationInDays),
         { value: bountyAmountWei } // Send EDU with the transaction
