@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Web3 Labs",
+  title: "Educhain Labs",
   description: "Empowering Web3 Explorers",
 };
 
@@ -23,7 +23,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
   const opts = {
     clientId: "<Does_Not_Matter_For_Sandbox_mode>",
     redirectUri: `${process.env.WEBSITE_URL}/redirect`, // Adjust this URL
