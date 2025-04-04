@@ -165,3 +165,12 @@ export async function pushToUserArray(
         : "User not found",
   };
 }
+
+  export async function getTotalUsers(){
+    const client = await clientPromise;
+    const db = client.db("EduChainLabsDB");
+    const usersCollection = db.collection("users");
+
+    const totalUsers = await usersCollection.countDocuments({});
+    return totalUsers;
+  }

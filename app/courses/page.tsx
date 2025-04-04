@@ -19,6 +19,7 @@ import BackButton from "@/components/BackButton";
 import MotivationSection from "@/components/MotivationSection";
 import Footer from "@/components/Footer";
 import { useOCAuth } from "@opencampus/ocid-connect-js";
+import { set } from "mongoose";
 
 // Course type definition
 export interface Course {
@@ -36,6 +37,7 @@ export interface Course {
 export default function CoursesPage() {
   const { isInitialized, authState } = useOCAuth();
   const [courses, setCourses] = useState<Course[]>([]);
+  const [activeStudents, setActiveStudents] = useState<number | string>(0);
   const [isLoading, setIsLoading] = useState(true);
   const [userCourses, setUserCourses] = useState<string[]>([]);
   const [completedCourses, setCompletedCourses] = useState<string[]>([]);
@@ -63,6 +65,23 @@ export default function CoursesPage() {
 
     fetchCourses();
   }, []);
+
+  useEffect(() => {
+      const getActiveStudents = async () =>{
+        try{
+          const response = await fetch("/api/active-students");
+          if(response.ok){
+            const data = await response.json();
+            setActiveStudents(data.activeStudents);
+          }
+          else setActiveStudents("_");
+        }
+        catch(error){
+          console.error("Failed to fetch active students:", error);
+        }
+      }
+      getActiveStudents();
+  },[activeStudents])
 
   // In CoursesPage.tsx, update the useEffect for fetching user's courses
   useEffect(() => {
@@ -252,9 +271,7 @@ export default function CoursesPage() {
               <div>
                 <p className="text-gray-400 text-sm">Active Students</p>
                 <h3 className="text-xl font-bold text-white">
-                  {courses
-                    .reduce((sum, course) => sum + course.registrations, 0)
-                    .toLocaleString()}
+                  {activeStudents.toLocaleString()}
                 </h3>
               </div>
             </div>
