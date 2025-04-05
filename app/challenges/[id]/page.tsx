@@ -305,19 +305,22 @@ export default function ChallengePage() {
 
     const requirementsList = requirementsString
       .split("&&")
-      .map((req) => req.trim());
+      .map((req) => req.trim())
+      .filter((req) => req.length > 0);
 
     return (
-      <ul className="list-disc pl-5 space-y-2">
+      <div className="space-y-3">
         {requirementsList.map((requirement, index) => (
-          <li key={index} style={{ color: colors.textSecondary }}>
-            {requirement}
-          </li>
+          <div key={index} className="flex">
+            <span className="mr-2" style={{ color: colors.textAccent }}>
+              •
+            </span>
+            <p style={{ color: colors.textSecondary }}>{requirement}</p>
+          </div>
         ))}
-      </ul>
+      </div>
     );
   };
-
   return (
     <div
       className="min-h-screen w-full overflow-x-hidden transition-colors duration-300"
