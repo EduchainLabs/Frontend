@@ -107,11 +107,20 @@ const CompetitionsPage = () => {
 
           // Get active challenges
           const activeChallenges = await contract.getActiveChallenges();
+          const completedChallenges = await contract.getCompletedChallenges();
+          const cancelledChallenges = await contract.getCancelledChallenges();
+          const expiredChallenges = await contract.getExpiredChallenges();
+          const allChallenges = [
+            ...activeChallenges,
+            ...completedChallenges,
+            ...cancelledChallenges,
+            ...expiredChallenges,
+          ];
           let challengesArray: ChallengeSummary[] = [];
           let totalBounty = 0;
 
-          for (let i = 0; i < activeChallenges.length; i++) {
-            const challenge = activeChallenges[i];
+          for (let i = 0; i < allChallenges.length; i++) {
+            const challenge = allChallenges[i];
             const remainingTime = await contract.getChallengeRemainingTime(
               challenge.challengeId
             );
