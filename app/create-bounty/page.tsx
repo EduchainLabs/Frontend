@@ -14,6 +14,7 @@ import {
   Calendar,
   CheckCircle,
   AlertCircle,
+  ListPlus,
 } from "lucide-react";
 import BackButton from "@/components/BackButton";
 import { ethers } from "ethers";
@@ -32,7 +33,8 @@ const CreateChallengePage = () => {
     title: "",
     description: "",
     problemStatement: "",
-    requirements: "",
+    currentRequirement: "",
+    requirements: [] as string[],
     bountyAmount: "",
     durationInDays: "",
     currentTag: "",
@@ -82,10 +84,34 @@ const CreateChallengePage = () => {
     }));
   };
 
-  const handleKeyDown = (e: any) => {
+  const handleAddRequirement = () => {
+    if (
+      formData.currentRequirement.trim() &&
+      !formData.requirements.includes(formData.currentRequirement.trim())
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        requirements: [...prev.requirements, prev.currentRequirement.trim()],
+        currentRequirement: "",
+      }));
+    }
+  };
+
+  const handleRemoveRequirement = (reqToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      requirements: prev.requirements.filter((req) => req !== reqToRemove),
+    }));
+  };
+
+  const handleKeyDown = (e: any, type: "tag" | "requirement") => {
     if (e.key === "Enter") {
       e.preventDefault();
-      handleAddTag();
+      if (type === "tag") {
+        handleAddTag();
+      } else {
+        handleAddRequirement();
+      }
     }
   };
 
@@ -95,17 +121,19 @@ const CreateChallengePage = () => {
     setError("");
 
     try {
-      // Validate form data (keep your existing validation)
+      // Validate form data
       if (
         !formData.creatorName ||
         !formData.title ||
         !formData.description ||
-        !formData.problemStatement ||
-        !formData.requirements ||
         !formData.bountyAmount ||
         !formData.durationInDays
       ) {
         throw new Error("Please fill all required fields");
+      }
+
+      if (formData.requirements.length === 0) {
+        throw new Error("Please add at least one requirement");
       }
 
       if (formData.tags.length === 0) {
@@ -142,11 +170,14 @@ const CreateChallengePage = () => {
       // Convert bounty amount to wei (assuming the input is in ETH)
       const bountyAmountWei = ethers.parseEther(formData.bountyAmount);
 
+      // Join requirements into a single string
+      const requirementsString = formData.requirements.join("&&");
+
       // Call the createChallenge function
       const tx = await contract.createChallenge(
         formData.title,
         formData.description,
-        formData.requirements,
+        requirementsString, // Passing requirements as a single string
         formData.tags,
         bountyAmountWei,
         parseInt(formData.durationInDays),
@@ -307,21 +338,55 @@ const CreateChallengePage = () => {
                 ></textarea>
               </div>
 
-              
-
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <ListPlus className="w-4 h-4 inline mr-1" />
                   Technical Requirements *
                 </label>
-                <textarea
-                  name="requirements"
-                  value={formData.requirements}
-                  onChange={handleChange}
-                  rows={5}
-                  className="w-full bg-gray-800/60 border border-gray-700 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-transparent"
-                  placeholder="List technical specifications, constraints, and acceptance criteria ( Please Make Sure to not use numbers or emojis in this field use commas ',' to seperate the requirements )"
-                  required
-                ></textarea>
+                <div className="flex items-center gap-4 mb-2">
+                  <input
+                    type="text"
+                    name="currentRequirement"
+                    value={formData.currentRequirement}
+                    onChange={handleChange}
+                    onKeyDown={(e) => handleKeyDown(e, "requirement")}
+                    className="w-full flex-1 bg-gray-800/60 border border-gray-700 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-transparent"
+                    placeholder="Add a technical requirement"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddRequirement}
+                    className="bg-violet-700 hover:bg-violet-600 text-white px-3 py-2.5 rounded-lg transition-colors border border-violet-700"
+                  >
+                    <Plus className="w-6 h-6" />
+                  </button>
+                </div>
+                <p className="text-xs text-gray-400 mb-3">
+                  Press Enter to add a requirement or click the plus button
+                </p>
+
+                <div className="flex flex-col gap-2 mt-2">
+                  {formData.requirements.map((req, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between px-4 py-2 bg-gray-800/60 border border-gray-700 rounded-lg"
+                    >
+                      <span className="text-sm text-gray-300">{req}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveRequirement(req)}
+                        className="text-gray-500 hover:text-gray-300 focus:outline-none"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  {formData.requirements.length === 0 && (
+                    <div className="text-sm text-gray-500 italic px-4 py-3 bg-gray-800/30 border border-gray-800 rounded-lg">
+                      No requirements added yet
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -377,7 +442,7 @@ const CreateChallengePage = () => {
                     name="currentTag"
                     value={formData.currentTag}
                     onChange={handleChange}
-                    onKeyDown={handleKeyDown}
+                    onKeyDown={(e) => handleKeyDown(e, "tag")}
                     className="w-full flex-1 bg-gray-800/60 border border-gray-700 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                     placeholder="e.g., Smart Contract, DeFi, NFT"
                   />
@@ -424,6 +489,21 @@ const CreateChallengePage = () => {
                 >
                   Cancel
                 </Link>
+                <button
+                  className="px-5 py-2.5 bg-transparent border border-gray-700 hover:bg-gray-800 text-gray-300 font-medium rounded-lg transition-colors flex items-center justify-center"
+                  onClick={() => {
+                    const requirementsString = formData.requirements.join("&&");
+                    console.log(
+                      formData.title,
+                      formData.description,
+                      requirementsString, // Passing requirements as a single string
+                      formData.tags,
+                      parseInt(formData.durationInDays),
+                    );
+                  }}
+                >
+                  Log Form Data
+                </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}

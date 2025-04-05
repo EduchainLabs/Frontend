@@ -383,36 +383,40 @@ const CompetitionsPage = () => {
             animate="show"
           >
             {filteredChallenges.map((challenge: ChallengeSummary) => (
-              <motion.div
+              <Link
                 key={challenge.challengeId}
-                variants={item}
-                whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                className="bg-gray-900/60 backdrop-blur rounded-xl border border-violet-900/50 overflow-hidden transition-all hover:shadow-lg hover:shadow-violet-900/20 hover:border-violet-700/70 flex flex-col"
+                href={`/challenges/${challenge.challengeId}`}
               >
-                {/* Card header with badge */}
-                <div className="p-6 flex-1">
-                  <div className="flex justify-between items-start mb-4">
-                    <div
-                      className={`text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5 ${getStatusColor(
-                        challenge.challengeStatus as Status
-                      )}`}
-                    >
-                      {getStatusIcon(challenge.challengeStatus as Status)}
-                      {getStatusText(challenge.challengeStatus as Status)}
+                <motion.div
+                  key={challenge.challengeId}
+                  variants={item}
+                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                  className="bg-gray-900/60 backdrop-blur rounded-xl border border-violet-900/50 overflow-hidden transition-all hover:shadow-lg hover:shadow-violet-900/20 hover:border-violet-700/70 flex flex-col"
+                >
+                  {/* Card header with badge */}
+                  <div className="p-6 flex-1">
+                    <div className="flex justify-between items-start mb-4">
+                      <div
+                        className={`text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5 ${getStatusColor(
+                          challenge.challengeStatus as Status
+                        )}`}
+                      >
+                        {getStatusIcon(challenge.challengeStatus as Status)}
+                        {getStatusText(challenge.challengeStatus as Status)}
+                      </div>
+                      <div className="flex items-center text-violet-400 font-medium">
+                        <DollarSign className="w-4 h-4 mr-1" />
+                        {challenge.bountyAmount} EDU
+                      </div>
                     </div>
-                    <div className="flex items-center text-violet-400 font-medium">
-                      <DollarSign className="w-4 h-4 mr-1" />
-                      {challenge.bountyAmount} EDU
-                    </div>
-                  </div>
 
-                  <h3 className="text-lg font-semibold mb-2 text-white line-clamp-1">
-                    {challenge.title}
-                  </h3>
-                  <p className="text-gray-300 text-sm mb-4 line-clamp-3">
-                    {challenge.description}
-                  </p>
-                  {/* {challenge.requirements && (
+                    <h3 className="text-lg font-semibold mb-2 text-white line-clamp-1">
+                      {challenge.title}
+                    </h3>
+                    <p className="text-gray-300 text-sm mb-4 line-clamp-3">
+                      {challenge.description}
+                    </p>
+                    {/* {challenge.requirements && (
                     <div className="mt-2">
                       <p className="text-xs font-medium text-gray-400">
                         Requirements:
@@ -422,75 +426,75 @@ const CompetitionsPage = () => {
                       </p>
                     </div>
                   )} */}
-                  {challenge.winner &&
-                    challenge.winner !==
-                      "0x0000000000000000000000000000000000000000" && (
-                      <div className="mt-2 flex items-center text-xs text-green-400 mb-2">
-                        <Award className="w-3 h-3 mr-1.5" />
+                    {challenge.winner &&
+                      challenge.winner !==
+                        "0x0000000000000000000000000000000000000000" && (
+                        <div className="mt-2 flex items-center text-xs text-green-400 mb-2">
+                          <Award className="w-3 h-3 mr-1.5" />
+                          <span>
+                            Winner:{" "}
+                            {challenge.winner.substring(0, 6) +
+                              "..." +
+                              challenge.winner.substring(38)}
+                          </span>
+                        </div>
+                      )}
+
+                    {/* Challenge attributes */}
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <div className="flex items-center text-xs text-gray-400">
+                        <Clock className="w-3 h-3 mr-1.5 text-gray-500" />
                         <span>
-                          Winner:{" "}
-                          {challenge.winner.substring(0, 6) +
-                            "..." +
-                            challenge.winner.substring(38)}
+                          {calculateTimeRemaining(
+                            challenge.startTime,
+                            challenge.duration
+                          )}
                         </span>
                       </div>
-                    )}
-
-                  {/* Challenge attributes */}
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="flex items-center text-xs text-gray-400">
-                      <Clock className="w-3 h-3 mr-1.5 text-gray-500" />
-                      <span>
-                        {calculateTimeRemaining(
-                          challenge.startTime,
-                          challenge.duration
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex items-center text-xs text-gray-400">
-                      <Users className="w-3 h-3 mr-1.5 text-gray-500" />
-                      <span>{challenge.submissionsCount} submissions</span>
-                    </div>
-                    <div className="flex items-center text-xs text-gray-400">
-                      <Zap className="w-3 h-3 mr-1.5 text-gray-500" />
-                      <span>
-                        {Number(challenge.bountyAmount) > 1500
-                          ? "Advanced"
-                          : Number(challenge.bountyAmount) > 500
-                          ? "Intermediate"
-                          : "Beginner"}
-                      </span>
-                    </div>
-                    <div className="flex items-center text-xs text-gray-400">
-                      <Code className="w-3 h-3 mr-1.5 text-gray-500" />
-                      <span>{challenge.tags[0] || "Blockchain"}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card footer */}
-                <div className="border-t border-gray-800 p-4 bg-gray-900/40 flex justify-between items-center">
-                  <div className="flex items-center">
-                    <div className="w-6 h-6 bg-violet-500 rounded-full flex items-center justify-center mr-2 text-xs font-bold">
-                      {challenge.creatorName.charAt(0)}
-                    </div>
-                    <div className="text-gray-400 text-sm">
-                      By{" "}
-                      <span className="text-violet-400">
-                        {challenge.creatorName}
-                      </span>
+                      <div className="flex items-center text-xs text-gray-400">
+                        <Users className="w-3 h-3 mr-1.5 text-gray-500" />
+                        <span>{challenge.submissionsCount} submissions</span>
+                      </div>
+                      <div className="flex items-center text-xs text-gray-400">
+                        <Zap className="w-3 h-3 mr-1.5 text-gray-500" />
+                        <span>
+                          {Number(challenge.bountyAmount) > 1500
+                            ? "Advanced"
+                            : Number(challenge.bountyAmount) > 500
+                            ? "Intermediate"
+                            : "Beginner"}
+                        </span>
+                      </div>
+                      <div className="flex items-center text-xs text-gray-400">
+                        <Code className="w-3 h-3 mr-1.5 text-gray-500" />
+                        <span>{challenge.tags[0] || "Blockchain"}</span>
+                      </div>
                     </div>
                   </div>
 
-                  <Link
-                    href={`/challenges/${challenge.challengeId}`}
-                    className="text-violet-400 text-sm font-medium hover:text-violet-300 transition-colors flex items-center"
-                  >
-                    View Details
-                    <ArrowRight className="w-4 h-4 ml-1" />
-                  </Link>
-                </div>
-              </motion.div>
+                  {/* Card footer */}
+                  <div className="border-t border-gray-800 p-4 bg-gray-900/40 flex justify-between items-center">
+                    <div className="flex items-center">
+                      <div className="w-6 h-6 bg-violet-500 rounded-full flex items-center justify-center mr-2 text-xs font-bold">
+                        {challenge.creatorName.charAt(0)}
+                      </div>
+                      <div className="text-gray-400 text-sm">
+                        By{" "}
+                        <span className="text-violet-400">
+                          {challenge.creatorName}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      className="text-violet-400 text-sm font-medium hover:text-violet-300 transition-colors flex items-center"
+                    >
+                      View Details
+                      <ArrowRight className="w-4 h-4 ml-1" />
+                    </div>
+                  </div>
+                </motion.div>
+              </Link>
             ))}
           </motion.div>
 

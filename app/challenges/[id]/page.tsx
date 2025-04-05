@@ -78,37 +78,6 @@ export default function ChallengePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
 
-  // Theme color configurations
-  // const darkColors = {
-  //   primary: "#7C3AED", // Violet-600
-  //   primaryHover: "#6D28D9", // Violet-700
-  //   accent: "#8B5CF6", // Violet-500
-  //   background: "#0F0F0F", // Near black
-  //   cardBg: "#1A1A1A", // Dark gray
-  //   cardBgSecondary: "#212121", // Slightly lighter dark gray
-  //   borderColor: "#2D2D2D", // Medium gray
-  //   accentBorder: "#7C3AED", // Violet-600
-  //   textPrimary: "#F9FAFB", // Gray-50
-  //   textSecondary: "#E5E7EB", // Gray-200
-  //   textMuted: "#9CA3AF", // Gray-400
-  //   textAccent: "#A78BFA", // Violet-400
-  // };
-
-  // const lightColors = {
-  //   primary: "#7C3AED", // Keep violet as primary
-  //   primaryHover: "#6D28D9", // Violet-700
-  //   accent: "#111111", // Black accent
-  //   background: "#F2E8FF", // Warmer pastel violet background
-  //   cardBg: "#FAF3FF", // Warmer, lighter pastel violet for cards
-  //   cardBgSecondary: "#EBE0FF", // Warmer secondary violet
-  //   borderColor: "#D8CAF0", // Warmer violet border
-  //   accentBorder: "#111111", // Black accent border
-  //   textPrimary: "#2D2235", // Warm dark violet, almost black
-  //   textSecondary: "#4A3960", // Warmer dark violet for secondary text
-  //   textMuted: "#786A92", // Warmer medium violet for muted text
-  //   textAccent: "#111111", // Black accent text
-  // };
-
   // Get current theme colors
   const colors = theme === "dark" ? darkColors : lightColors;
 
@@ -164,8 +133,8 @@ export default function ChallengePage() {
             duration: Number(challengeData.duration),
             winner: challengeData.winner,
           };
-          
-          console.log(challengeData)
+
+          console.log(challengeData);
           setChallenge(formattedChallenge);
         }
       } catch (error) {
@@ -238,7 +207,12 @@ export default function ChallengePage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          problem_statement: JSON.stringify("Description : " + challenge.description + "\n Requirements :" + challenge.requirements),
+          problem_statement: JSON.stringify(
+            "Description : " +
+              challenge.description +
+              "\n Requirements :" +
+              challenge.requirements
+          ),
           code,
         }),
       });
@@ -325,6 +299,25 @@ export default function ChallengePage() {
     }
   };
 
+  // Function to render requirements as a list with proper formatting
+  const renderRequirements = (requirementsString: string) => {
+    if (!requirementsString) return null;
+
+    const requirementsList = requirementsString
+      .split("&&")
+      .map((req) => req.trim());
+
+    return (
+      <ul className="list-disc pl-5 space-y-2">
+        {requirementsList.map((requirement, index) => (
+          <li key={index} style={{ color: colors.textSecondary }}>
+            {requirement}
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
   return (
     <div
       className="min-h-screen w-full overflow-x-hidden transition-colors duration-300"
@@ -335,7 +328,8 @@ export default function ChallengePage() {
         color: colors.textPrimary,
       }}
     >
-      <div className="w-full max-w-7xl mx-auto p-4 flex flex-col">
+      {/* Main content container with max height */}
+      <div className="w-full max-w-7xl mx-auto p-4 flex flex-col max-h-screen overflow-auto">
         {/* Header with back button and theme toggle */}
         <div className="flex justify-between items-center mb-6">
           <Button
@@ -379,19 +373,19 @@ export default function ChallengePage() {
           </div>
         ) : challenge ? (
           <>
-            {/* Side by Side Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Side by Side Layout with controlled height */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
               {/* Left Column - Challenge Details */}
-              <div className="flex flex-col">
+              <div className="flex flex-col overflow-auto">
                 {/* Challenge Header */}
                 <Card
-                  className="p-6 mb-6 transition-colors duration-300 h-full"
+                  className="p-6 mb-6 transition-colors duration-300"
                   style={{
                     backgroundColor: colors.cardBg,
                     borderColor: colors.borderColor,
                   }}
                 >
-                  <div className="flex flex-col justify-between h-full">
+                  <div className="flex flex-col justify-between">
                     <div>
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                         <div>
@@ -457,7 +451,7 @@ export default function ChallengePage() {
                         </div>
                       </div>
 
-                      <div className="space-y-4 overflow-y-auto">
+                      <div className="space-y-4">
                         <div>
                           <h2
                             className="text-lg font-semibold mb-2"
@@ -477,9 +471,7 @@ export default function ChallengePage() {
                           >
                             Requirements
                           </h2>
-                          <p style={{ color: colors.textSecondary }}>
-                            {challenge.requirements}
-                          </p>
+                          {renderRequirements(challenge.requirements)}
                         </div>
 
                         <div>
@@ -527,14 +519,15 @@ export default function ChallengePage() {
                 </Card>
               </div>
 
-              {/* Right Column - Solution Editor */}
+              {/* Right Column - Solution Editor with fixed height */}
               {challenge.challengeStatus === Status.waiting && (
-                <div className="flex flex-col">
+                <div className="flex flex-col h-full">
                   <Card
-                    className="p-6 transition-colors duration-300 h-full"
+                    className="p-6 transition-colors duration-300 flex flex-col"
                     style={{
                       backgroundColor: colors.cardBg,
                       borderColor: colors.borderColor,
+                      height: "calc(100vh - 10rem)", // Controlled height
                     }}
                   >
                     <div className="mb-4 flex justify-between items-center">
@@ -566,11 +559,13 @@ export default function ChallengePage() {
                       </Button>
                     </div>
 
+                    {/* Editor container with flex-grow to fill available space but not overflow */}
                     <div
-                      className="flex-grow h-full rounded-md overflow-hidden border transition-colors duration-300"
+                      className="border rounded-md overflow-hidden flex-grow"
                       style={{
                         borderColor: colors.borderColor,
-                        minHeight: "calc(100vh - 250px)", // Dynamic height to fill available space
+                        display: "flex",
+                        flexDirection: "column",
                       }}
                     >
                       <Editor
