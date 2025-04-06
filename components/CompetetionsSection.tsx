@@ -264,7 +264,6 @@ const CompetitionsPage = () => {
               bounties while improving your blockchain skills
             </p>
           </motion.div>
-
           {/* Stats section */}
           <motion.div
             className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16"
@@ -306,7 +305,6 @@ const CompetitionsPage = () => {
               </div>
             </div>
           </motion.div>
-
           {/* Filter and search bar */}
           <motion.div
             className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6"
@@ -374,8 +372,6 @@ const CompetitionsPage = () => {
               <ChevronRight className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" />
             </Link>
           </motion.div>
-
-          {/* Challenge cards with improved design */}
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             variants={container}
@@ -391,10 +387,10 @@ const CompetitionsPage = () => {
                   key={challenge.challengeId}
                   variants={item}
                   whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                  className="bg-gray-900/60 backdrop-blur rounded-xl border border-violet-900/50 overflow-hidden transition-all hover:shadow-lg hover:shadow-violet-900/20 hover:border-violet-700/70 flex flex-col"
+                  className="bg-gray-900/60 backdrop-blur rounded-xl border border-violet-900/50 overflow-hidden transition-all hover:shadow-lg hover:shadow-violet-900/20 hover:border-violet-700/70 flex flex-col h-[340px]" // Reduced fixed height
                 >
                   {/* Card header with badge */}
-                  <div className="p-6 flex-1">
+                  <div className="p-6 flex-1 flex flex-col">
                     <div className="flex justify-between items-start mb-4">
                       <div
                         className={`text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5 ${getStatusColor(
@@ -413,19 +409,16 @@ const CompetitionsPage = () => {
                     <h3 className="text-lg font-semibold mb-2 text-white line-clamp-1">
                       {challenge.title}
                     </h3>
-                    <p className="text-gray-300 text-sm mb-4 line-clamp-3">
-                      {challenge.description}
-                    </p>
-                    {/* {challenge.requirements && (
-                    <div className="mt-2">
-                      <p className="text-xs font-medium text-gray-400">
-                        Requirements:
-                      </p>
-                      <p className="text-gray-300 text-sm line-clamp-2 mb-2">
-                        {challenge.requirements}
+                    <div className="h-[48px] overflow-hidden">
+                      {" "}
+                      {/* Reduced height for description container */}
+                      <p className="text-gray-300 text-sm line-clamp-2">
+                        {" "}
+                        {/* Changed to line-clamp-2 */}
+                        {challenge.description}
                       </p>
                     </div>
-                  )} */}
+
                     {challenge.winner &&
                       challenge.winner !==
                         "0x0000000000000000000000000000000000000000" && (
@@ -441,7 +434,7 @@ const CompetitionsPage = () => {
                       )}
 
                     {/* Challenge attributes */}
-                    <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="grid grid-cols-2 gap-3 mt-4 mb-2">
                       <div className="flex items-center text-xs text-gray-400">
                         <Clock className="w-3 h-3 mr-1.5 text-gray-500" />
                         <span>
@@ -473,7 +466,7 @@ const CompetitionsPage = () => {
                   </div>
 
                   {/* Card footer */}
-                  <div className="border-t border-gray-800 p-4 bg-gray-900/40 flex justify-between items-center">
+                  <div className="border-t border-gray-800 p-4 bg-gray-900/40 flex justify-between items-center mt-auto">
                     <div className="flex items-center">
                       <div className="w-6 h-6 bg-violet-500 rounded-full flex items-center justify-center mr-2 text-xs font-bold">
                         {challenge.creatorName.charAt(0)}
@@ -486,9 +479,7 @@ const CompetitionsPage = () => {
                       </div>
                     </div>
 
-                    <div
-                      className="text-violet-400 text-sm font-medium hover:text-violet-300 transition-colors flex items-center"
-                    >
+                    <div className="text-violet-400 text-sm font-medium hover:text-violet-300 transition-colors flex items-center">
                       View Details
                       <ArrowRight className="w-4 h-4 ml-1" />
                     </div>
@@ -497,7 +488,6 @@ const CompetitionsPage = () => {
               </Link>
             ))}
           </motion.div>
-
           {/* Empty state with improved design */}
           {filteredChallenges.length === 0 && (
             <motion.div
@@ -529,7 +519,6 @@ const CompetitionsPage = () => {
               </button>
             </motion.div>
           )}
-
           {/* Call to action section */}
           {/* {filteredChallenges.length > 0 && (
             <motion.div

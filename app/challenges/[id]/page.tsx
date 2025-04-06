@@ -254,7 +254,7 @@ export default function ChallengePage() {
 
         // Show success message
         alert("Solution submitted successfully to the blockchain!");
-        router.push("/dashboard");
+        router.push("/challenges");
       }
     } catch (error) {
       console.error("Error submitting solution:", error);
