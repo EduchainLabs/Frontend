@@ -1,11 +1,11 @@
 import { Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
-// import HeroSection from "@/components/HeroSection";
 import ServicesSection from "@/components/ServicesSection";
 import CodeEditorDemo from "@/components/CodeEditorDemo";
 import Footer from "@/components/Footer";
 import HeroSection from "@/components/HeroSection";
 import CTASection from "@/components/CTASection";
+import TutorialOnboarding from "@/components/TutorialOnboarding";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +21,7 @@ export default function Home() {
       </div>
 
       {/* Content */}
-      <div className="relative ">
+      <div className="relative">
         <Navbar />
         <HeroSection />
         <CodeEditorDemo />
@@ -29,6 +29,9 @@ export default function Home() {
         <CTASection />
         <Footer />
       </div>
+
+      {/* Tutorial Onboarding - only shows for new unauthenticated users */}
+      <TutorialOnboarding />
     </main>
   );
 }

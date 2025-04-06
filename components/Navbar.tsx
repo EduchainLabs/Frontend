@@ -4,20 +4,24 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import LoginButton from "./LoginButton";
 import Logo from "./ui/Mark";
-import { User } from "lucide-react";
+import { User, Book } from "lucide-react";
 
 const Navbar = () => {
   const [isHovered, setIsHovered] = useState(false);
   const { isInitialized, authState, ocAuth } = useOCAuth();
   const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [hasSeenTutorial, setHasSeenTutorial] = useState(true);
+
+  useEffect(() => {
+    // Check if user has seen the tutorial
+    if (typeof window !== "undefined") {
+      setHasSeenTutorial(!!localStorage.getItem("hasSeenTutorial"));
+    }
+  }, []);
 
   useEffect(() => {
     // Only run when user becomes authenticated
-    if (
-      isInitialized &&
-      authState.isAuthenticated &&
-      !isCreatingUser
-    ) {
+    if (isInitialized && authState.isAuthenticated && !isCreatingUser) {
       createUserAfterLogin();
     }
   }, [isInitialized]);
@@ -105,6 +109,21 @@ const Navbar = () => {
           Chatbot
           <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-400 group-hover:w-full transition-all duration-300"></span>
         </Link>
+
+        {/* Tutorial link - visible for unauthenticated users who haven't seen tutorial */}
+        {isInitialized && !authState.isAuthenticated && !hasSeenTutorial && (
+          <Link
+            href="/tutorials"
+            className="text-white hover:text-violet-400 transition-colors relative group"
+          >
+            <span className="flex items-center">
+              <Book className="w-4 h-4 mr-1" />
+              Tutorials
+              <span className="absolute -right-3 -top-1 w-2 h-2 bg-violet-500 rounded-full animate-pulse"></span>
+            </span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-400 group-hover:w-full transition-all duration-300"></span>
+          </Link>
+        )}
       </div>
 
       <div>
