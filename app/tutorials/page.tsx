@@ -101,7 +101,7 @@ const TutorialPage = () => {
             <div className="w-full overflow-hidden rounded-lg bg-gray-800 flex items-center justify-center">
               <iframe
                 className="w-full h-64 md:h-80 lg:h-96"
-                src="https://www.youtube.com/embed/nmNBvSnA_44"
+                src="https://www.youtube.com/embed/U7NeJ2CpwM8"
                 title="How to Setup MetaMask for Blockchain Lab"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
