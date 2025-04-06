@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0xA38232C301951902e8F807a94eEb624c443A40D3";
+export const CONTRACT_ADDRESS = "0x7E3A39DC3820CEd91C5CA0713936602492CE317b";
 export const CONTRACT_ABI = [
   {
     inputs: [],
@@ -434,6 +434,81 @@ export const CONTRACT_ABI = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "getCancelledChallenges",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "challengeId",
+            type: "uint256",
+          },
+          {
+            internalType: "address",
+            name: "creator",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "bountyAmount",
+            type: "uint256",
+          },
+          {
+            internalType: "string",
+            name: "title",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "description",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "requirements",
+            type: "string",
+          },
+          {
+            internalType: "string[]",
+            name: "tags",
+            type: "string[]",
+          },
+          {
+            internalType: "enum CodeBounty.Status",
+            name: "challengeStatus",
+            type: "uint8",
+          },
+          {
+            internalType: "uint256",
+            name: "submissionsCount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "startTime",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "duration",
+            type: "uint256",
+          },
+          {
+            internalType: "address",
+            name: "winner",
+            type: "address",
+          },
+        ],
+        internalType: "struct CodeBounty.Challenge[]",
+        name: "",
+        type: "tuple[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -447,6 +522,156 @@ export const CONTRACT_ABI = [
         internalType: "uint256",
         name: "",
         type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getCompletedChallenges",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "challengeId",
+            type: "uint256",
+          },
+          {
+            internalType: "address",
+            name: "creator",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "bountyAmount",
+            type: "uint256",
+          },
+          {
+            internalType: "string",
+            name: "title",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "description",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "requirements",
+            type: "string",
+          },
+          {
+            internalType: "string[]",
+            name: "tags",
+            type: "string[]",
+          },
+          {
+            internalType: "enum CodeBounty.Status",
+            name: "challengeStatus",
+            type: "uint8",
+          },
+          {
+            internalType: "uint256",
+            name: "submissionsCount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "startTime",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "duration",
+            type: "uint256",
+          },
+          {
+            internalType: "address",
+            name: "winner",
+            type: "address",
+          },
+        ],
+        internalType: "struct CodeBounty.Challenge[]",
+        name: "",
+        type: "tuple[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getExpiredChallenges",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "challengeId",
+            type: "uint256",
+          },
+          {
+            internalType: "address",
+            name: "creator",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "bountyAmount",
+            type: "uint256",
+          },
+          {
+            internalType: "string",
+            name: "title",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "description",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "requirements",
+            type: "string",
+          },
+          {
+            internalType: "string[]",
+            name: "tags",
+            type: "string[]",
+          },
+          {
+            internalType: "enum CodeBounty.Status",
+            name: "challengeStatus",
+            type: "uint8",
+          },
+          {
+            internalType: "uint256",
+            name: "submissionsCount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "startTime",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "duration",
+            type: "uint256",
+          },
+          {
+            internalType: "address",
+            name: "winner",
+            type: "address",
+          },
+        ],
+        internalType: "struct CodeBounty.Challenge[]",
+        name: "",
+        type: "tuple[]",
       },
     ],
     stateMutability: "view",
@@ -547,7 +772,13 @@ export const CONTRACT_ABI = [
       },
     ],
     name: "userRewarded",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
     stateMutability: "view",
     type: "function",
   },

@@ -15,6 +15,9 @@ import {
   Award,
   FileCode,
   Tag,
+  AlertCircle,
+  CheckCircle,
+  X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ethers } from "ethers";
@@ -39,6 +42,13 @@ interface Challenge {
 
 type ThemeMode = "dark" | "light";
 type ValidationStatus = null | "validating" | "valid" | "invalid";
+type ToastType = "success" | "error" | "info";
+
+interface Toast {
+  id: string;
+  message: string;
+  type: ToastType;
+}
 
 interface ValidationResult {
   status: boolean;
@@ -77,9 +87,26 @@ export default function ChallengePage() {
   const [showValidation, setShowValidation] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
   // Get current theme colors
   const colors = theme === "dark" ? darkColors : lightColors;
+
+  // Function to show toast notifications
+  const showToast = (message: string, type: ToastType = "info") => {
+    const id = Date.now().toString();
+    setToasts((prev) => [...prev, { id, message, type }]);
+
+    // Auto-remove toast after 5 seconds
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, 5000);
+  };
+
+  // Remove specific toast
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  };
 
   useEffect(() => {
     if (!challengeId) return;
@@ -139,6 +166,7 @@ export default function ChallengePage() {
         }
       } catch (error) {
         console.error("Error fetching challenge:", error);
+        showToast("Failed to load challenge details", "error");
       } finally {
         setIsLoading(false);
       }
@@ -220,9 +248,16 @@ export default function ChallengePage() {
       const data = await response.json();
       setValidationResult(data);
       setValidationStatus(data.status ? "valid" : "invalid");
+
+      if (data.status) {
+        showToast("Code validation successful!", "success");
+      } else {
+        showToast("Code validation failed. Please check the errors.", "error");
+      }
     } catch (error) {
       console.error("Error validating code:", error);
       setValidationStatus("invalid");
+      showToast("Error validating code. Please try again.", "error");
     }
   };
 
@@ -243,6 +278,8 @@ export default function ChallengePage() {
         // Create a hash of the solution
         const solutionHash = ethers.keccak256(ethers.toUtf8Bytes(code));
 
+        showToast("Submitting solution to blockchain...", "info");
+
         // Submit solution to the contract
         const tx = await contract.submitSolution(
           challenge.challengeId,
@@ -253,12 +290,15 @@ export default function ChallengePage() {
         await tx.wait();
 
         // Show success message
-        alert("Solution submitted successfully to the blockchain!");
-        router.push("/challenges");
+        showToast(
+          "Solution submitted successfully to the blockchain!",
+          "success"
+        );
+        setTimeout(() => router.push("/dashboard"), 2000);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting solution:", error);
-      alert(`Failed to submit solution: ${error}`);
+      showToast(`Failed to submit solution: ${error.reason}`, "error");
     }
   };
 
@@ -321,6 +361,66 @@ export default function ChallengePage() {
       </div>
     );
   };
+
+  // Toast notification component
+  const ToastNotifications = () => {
+    return (
+      <div className="fixed top-4 left-4 z-50 space-y-2">
+        <AnimatePresence>
+          {toasts.map((toast) => (
+            <motion.div
+              key={toast.id}
+              initial={{ opacity: 0, y: -20, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.8 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center p-4 rounded-lg shadow-lg overflow-hidden max-w-7xl"
+              style={{
+                backgroundColor: colors.cardBg,
+                borderColor: colors.borderColor,
+                borderWidth: 1,
+                borderLeftWidth: 4,
+                borderLeftColor:
+                  toast.type === "success"
+                    ? "#4ADE80"
+                    : toast.type === "error"
+                    ? "#EF4444"
+                    : "#60A5FA",
+              }}
+            >
+              <div className="flex-shrink-0 mr-3">
+                {toast.type === "success" && (
+                  <CheckCircle size={20} color="#4ADE80" />
+                )}
+                {toast.type === "error" && (
+                  <AlertCircle size={20} color="#EF4444" />
+                )}
+                {toast.type === "info" && <Clock size={20} color="#60A5FA" />}
+              </div>
+              <div
+                className="flex-grow text-sm mr-2 max-w-6xl"
+                style={{ color: colors.textPrimary }}
+              >
+                {toast.message}
+              </div>
+              <button
+                onClick={() => removeToast(toast.id)}
+                className="flex-shrink-0 rounded-full p-1 hover:bg-opacity-10 transition-colors"
+                style={{
+                  background: "transparent",
+                  color: colors.textSecondary,
+                  // Removed invalid hoverBackgroundColor property
+                }}
+              >
+                <X size={18} />
+              </button>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    );
+  };
+
   return (
     <div
       className="min-h-screen w-full overflow-x-hidden transition-colors duration-300"
@@ -331,6 +431,9 @@ export default function ChallengePage() {
         color: colors.textPrimary,
       }}
     >
+      {/* Toast Notifications */}
+      <ToastNotifications />
+
       {/* Main content container with max height */}
       <div className="w-full max-w-7xl mx-auto p-4 flex flex-col max-h-screen overflow-auto">
         {/* Header with back button and theme toggle */}
@@ -530,7 +633,7 @@ export default function ChallengePage() {
                     style={{
                       backgroundColor: colors.cardBg,
                       borderColor: colors.borderColor,
-                      height: "calc(100vh - 10rem)", // Controlled height
+                      height: "calc(100vh + 4rem)", // Controlled height
                     }}
                   >
                     <div className="mb-4 flex justify-between items-center">
