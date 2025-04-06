@@ -294,7 +294,7 @@ export default function ChallengePage() {
           "Solution submitted successfully to the blockchain!",
           "success"
         );
-        setTimeout(() => router.push("/dashboard"), 2000);
+        setTimeout(() => router.push("/challenges"), 2000);
       }
     } catch (error: any) {
       console.error("Error submitting solution:", error);
