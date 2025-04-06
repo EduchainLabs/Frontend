@@ -101,7 +101,7 @@ const TutorialPage = () => {
             <div className="w-full overflow-hidden rounded-lg bg-gray-800 flex items-center justify-center">
               <iframe
                 className="w-full h-64 md:h-80 lg:h-96"
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                src="https://www.youtube.com/embed/nmNBvSnA_44"
                 title="How to Setup MetaMask for Blockchain Lab"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -253,7 +253,11 @@ const TutorialPage = () => {
                   />
                 </div>
                 <p className="text-gray-300 text-sm text-center">
-                  <strong className="text-violet-400">Successfully Installed MetaMask:</strong> After you have succesfully installed MetaMask You Would See a Screen like this.
+                  <strong className="text-violet-400">
+                    Successfully Installed MetaMask:
+                  </strong>{" "}
+                  After you have succesfully installed MetaMask You Would See a
+                  Screen like this.
                 </p>
               </div>
               <div className="bg-gray-800/60 rounded-lg p-4">
