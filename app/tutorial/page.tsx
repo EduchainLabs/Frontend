@@ -253,6 +253,18 @@ const TutorialPage = () => {
                   />
                 </div>
                 <p className="text-gray-300 text-sm text-center">
+                  <strong className="text-violet-400">Successfully Installed MetaMask:</strong> After you have succesfully installed MetaMask You Would See a Screen like this.
+                </p>
+              </div>
+              <div className="bg-gray-800/60 rounded-lg p-4">
+                <div className="flex items-center justify-center mb-4">
+                  <img
+                    src="/Tutorial/RecoveryPhrase.png"
+                    alt="MetaMask Wallet Creation"
+                    className="rounded-lg max-w-full h-auto"
+                  />
+                </div>
+                <p className="text-gray-300 text-sm text-center">
                   <strong className="text-violet-400">Important:</strong> Your
                   recovery phrase is the only way to recover your wallet if you
                   forget your password or lose access to your device. Store it
