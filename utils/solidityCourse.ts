@@ -11,6 +11,8 @@ export const courses = [
     registrations: 0,
     image: "/images/blockchain-intro.png",
     index: 1,
+    metadataUri:
+      "https://aqua-rare-worm-454.mypinata.cloud/ipfs/bafybeibfcgq7tyer7omvowardo7m6mbm7tyaobp2iihxdgl7qcjp3i46ge/IntroToBlockchain.json",
     lessons: [
       {
         id: "blockchain-fundamentals",
@@ -56,6 +58,8 @@ export const courses = [
     registrations: 0,
     image: "/images/solidity-basics.png",
     index: 0,
+    metadataUri:
+      "https://aqua-rare-worm-454.mypinata.cloud/ipfs/bafybeibfcgq7tyer7omvowardo7m6mbm7tyaobp2iihxdgl7qcjp3i46ge/BasicsOfSolidity.json",
     lessons: [
       {
         id: "intro-to-solidity",

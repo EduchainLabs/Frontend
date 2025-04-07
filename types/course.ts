@@ -26,5 +26,6 @@ export interface Course {
   tags: string[];
   lessons: Lesson[];
   registrations: number;
+  metadataUri: string;
   index: number;
 }

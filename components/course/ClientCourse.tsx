@@ -117,7 +117,7 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
 
     fetchUserCourseData();
   }, [userOCId, courseId]);
-  
+
   const recordCourseCompletion = async () => {
     console.log("Course completed:", course?.id);
 
@@ -150,13 +150,13 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
             body: JSON.stringify({
               OCId: userOCId,
               courseId: course.id,
-              course : course,
+              course: course,
             }),
           });
 
           const arrayData = await arrayResponse.json();
           if (arrayData.success) {
-            console.log("Course added in the list")
+            console.log("Course added in the list");
           }
 
           const data = await response.json();
@@ -431,13 +431,11 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
             <CourseProgressBar course={course} currentLesson={currentLesson} />
 
             {/* Display Course Completion component if course is completed */}
-            {courseCompleted && (
-              <CourseCompletion
-                courseId={courseId}
-                metadataIndex={course.index || 0}
-                nftMinted={nftMinted}
-              />
-            )}
+            <CourseCompletion
+              courseId={courseId}
+              metadataURI={course.metadataUri} // this should come from your course object
+              nftMinted={nftMinted}
+            />
 
             {/* Title card */}
             <LessonHeader lesson={currentLesson} />
