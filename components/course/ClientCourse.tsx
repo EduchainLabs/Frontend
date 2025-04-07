@@ -431,11 +431,13 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
             <CourseProgressBar course={course} currentLesson={currentLesson} />
 
             {/* Display Course Completion component if course is completed */}
-            <CourseCompletion
-              courseId={courseId}
-              metadataURI={course.metadataUri} // this should come from your course object
-              nftMinted={nftMinted}
-            />
+            {courseCompleted && (
+              <CourseCompletion
+                courseId={courseId}
+                metadataURI={course.metadataUri}
+                nftMinted={nftMinted}
+              />
+            )}
 
             {/* Title card */}
             <LessonHeader lesson={currentLesson} />

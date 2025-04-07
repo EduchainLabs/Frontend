@@ -198,7 +198,7 @@ export const CONTRACT_ABI = [
   {
     inputs: [
       { internalType: "address", name: "recipient", type: "address" },
-      { internalType: "uint256", name: "metadataIndex", type: "uint256" },
+      { internalType: "string", name: "metadataURI", type: "string" },
     ],
     name: "mintCertificate",
     outputs: [],
@@ -216,13 +216,6 @@ export const CONTRACT_ABI = [
     inputs: [],
     name: "nextTokenId",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    name: "nftMetadataURIs",
-    outputs: [{ internalType: "string", name: "", type: "string" }],
     stateMutability: "view",
     type: "function",
   },
@@ -320,4 +313,4 @@ export const CONTRACT_ABI = [
     type: "function",
   },
 ];
-export const CONTRACT_ADDRESS = "0x040fc81296f79B04201aDA2dfb02826e59a99D94";
+export const CONTRACT_ADDRESS = "0x58e491bEB8B389e9eea9d832639819D5A557d121";
