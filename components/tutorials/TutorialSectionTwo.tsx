@@ -30,7 +30,7 @@ const TutorialSectionTwo = () => {
             <div className="w-full overflow-hidden rounded-lg bg-gray-800 flex items-center justify-center">
               <iframe
                 className="w-full h-64 md:h-80 lg:h-96"
-                src="https://www.youtube.com/embed/FQ2EgR3KdzY"
+                src="https://www.youtube.com/embed/Iihbh5WcAEM"
                 title="How to Get EDU Chain Testnet Tokens and Setup OCID"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
