@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingPage from "@/components/LoadingComponent";
 import { LoginCallBack, useOCAuth } from "@opencampus/ocid-connect-js";
 import { useRouter } from "next/navigation";
 
@@ -20,7 +21,7 @@ export default function RedirectPage() {
   }
 
   function CustomLoadingComponent() {
-    return <div>Loading....</div>;
+    return <LoadingPage />;
   }
 
   return (
