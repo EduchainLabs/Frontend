@@ -140,6 +140,26 @@ const TutorialSectionTwo = () => {
                 </div>
                 <p className="text-gray-300 text-sm text-center">
                   <strong className="text-violet-400">HackQuest Faucet:</strong>{" "}
+                  Select the EDU Chain Testnet Tokens.
+                </p>
+              </div>
+            </div>
+          </div>
+
+         
+          {/* Step 1: Get EDU Chain Testnet Tokens */}
+          <div className="bg-gray-900/60 backdrop-blur p-6 rounded-xl border border-violet-900/50">
+            <div className="flex items-start mb-4">
+              <div className="bg-gray-800/60 rounded-lg p-4">
+                <div className="flex items-center justify-center mb-4">
+                  <img
+                    src="/Tutorial/RequestTokens.png"
+                    alt="HackQuest Faucet"
+                    className="rounded-lg max-w-full h-auto"
+                  />
+                </div>
+                <p className="text-gray-300 text-sm text-center">
+                  <strong className="text-violet-400">HackQuest Faucet:</strong>{" "}
                   Request EDU testnet tokens to interact with the blockchain
                 </p>
               </div>
@@ -230,17 +250,16 @@ const TutorialSectionTwo = () => {
               <div className="bg-gray-800/60 rounded-lg p-4">
                 <div className="flex items-center justify-center mb-4">
                   <img
-                    src="/Tutorial/OCID-Diagram.png"
+                    src="/Tutorial/IntroOCID.png"
                     alt="Open Campus ID Diagram"
                     className="rounded-lg max-w-full h-auto"
                   />
                 </div>
                 <p className="text-gray-300 text-sm text-center">
                   <strong className="text-violet-400">
-                    OCID Architecture:
+                    OCID Introduction:
                   </strong>{" "}
-                  How your identity, achievements, and learning journey are
-                  represented on the blockchain
+                  What OCID Provides For Each Learner.
                 </p>
               </div>
             </div>
