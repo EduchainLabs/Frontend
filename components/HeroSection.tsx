@@ -7,7 +7,7 @@ import SolidityLogo from "./ui/Solidity";
 
 const HeroSection = () => {
   return (
-    <section className="px-6 min-h-screen py-20 relative overflow-hidden flex items-center">
+    <section className="px-4 sm:px-6 min-h-screen py-20 relative overflow-hidden flex items-center">
       {/* Updated Background to match CodeEditorDemo */}
       <div className="absolute inset-0 backdrop-blur z-0">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_rgba(124,58,237,0.15),transparent_70%)]"></div>
@@ -49,11 +49,11 @@ const HeroSection = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto relative z-10">
+      <div className="max-w-6xl mx-auto relative z-10 w-full">
         <div className="flex flex-col lg:flex-row items-center justify-between lg:gap-12">
-          {/* Text content - enhanced with more details */}
+          {/* Text content - enhanced with more details and better mobile spacing */}
           <motion.div
-            className="lg:w-2/5 text-center lg:text-left mb-10 lg:mb-0"
+            className="w-full lg:w-2/5 text-center lg:text-left mb-8 lg:mb-0"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
@@ -62,6 +62,7 @@ const HeroSection = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
+              className="flex justify-center lg:justify-start"
             >
               <span className="bg-violet-900/30 text-violet-400 text-xs font-medium px-3 py-1 rounded-full inline-block mb-4">
                 Web3 Development Platform
@@ -69,7 +70,7 @@ const HeroSection = () => {
             </motion.div>
 
             <motion.h1
-              className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-5"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4 sm:mb-5"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.7 }}
@@ -79,7 +80,7 @@ const HeroSection = () => {
             </motion.h1>
 
             <motion.p
-              className="text-gray-300 text-base md:text-lg mb-6 max-w-lg mx-auto lg:mx-0"
+              className="text-gray-300 text-sm sm:text-base md:text-lg mb-5 sm:mb-6 max-w-md mx-auto lg:mx-0"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.7 }}
@@ -90,17 +91,17 @@ const HeroSection = () => {
               beginner to advanced.
             </motion.p>
 
-            {/* Added features list */}
+            {/* Added features list with improved mobile layout */}
             <motion.div
-              className="mb-6"
+              className="mb-5 sm:mb-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7, duration: 0.7 }}
             >
-              <ul className="flex flex-col md:flex-row gap-3 flex-wrap justify-center lg:justify-start text-sm">
-                <li className="flex items-center text-violet-300">
+              <ul className="flex flex-wrap justify-center lg:justify-start text-xs sm:text-sm gap-y-2">
+                <li className="flex items-center text-violet-300 w-full sm:w-auto">
                   <svg
-                    className="w-4 h-4 mr-1.5 text-violet-400"
+                    className="w-4 h-4 mr-1.5 text-violet-400 flex-shrink-0"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -113,9 +114,9 @@ const HeroSection = () => {
                   </svg>
                   Live Compilation
                 </li>
-                <li className="flex items-center text-violet-300 md:ml-4">
+                <li className="flex items-center text-violet-300 w-full sm:w-auto sm:ml-4">
                   <svg
-                    className="w-4 h-4 mr-1.5 text-violet-400"
+                    className="w-4 h-4 mr-1.5 text-violet-400 flex-shrink-0"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -128,9 +129,9 @@ const HeroSection = () => {
                   </svg>
                   AI Assistance
                 </li>
-                <li className="flex items-center text-violet-300 md:ml-4">
+                <li className="flex items-center text-violet-300 w-full sm:w-auto sm:ml-4">
                   <svg
-                    className="w-4 h-4 mr-1.5 text-violet-400"
+                    className="w-4 h-4 mr-1.5 text-violet-400 flex-shrink-0"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -154,7 +155,7 @@ const HeroSection = () => {
             >
               <Link
                 href="/code"
-                className="px-5 py-2.5 bg-violet-700 hover:bg-violet-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center group"
+                className="w-full sm:w-auto px-5 py-2.5 bg-violet-700 hover:bg-violet-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center group"
               >
                 Start Coding
                 <svg
@@ -174,15 +175,15 @@ const HeroSection = () => {
               </Link>
               <Link
                 href="/courses"
-                className="px-5 py-2.5 bg-transparent border border-violet-700 hover:bg-violet-900/30 text-violet-400 font-medium rounded-lg transition-all flex items-center justify-center"
+                className="w-full sm:w-auto px-5 py-2.5 bg-transparent border border-violet-700 hover:bg-violet-900/30 text-violet-400 font-medium rounded-lg transition-all flex items-center justify-center"
               >
                 Explore Courses
               </Link>
             </motion.div>
 
-            {/* Added trust indicators */}
+            {/* Added trust indicators with improved mobile layout */}
             <motion.div
-              className="mt-6 flex flex-wrap justify-center lg:justify-start items-center gap-4"
+              className="mt-5 sm:mt-6 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-2 sm:gap-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1, duration: 0.7 }}
@@ -202,49 +203,51 @@ const HeroSection = () => {
             </motion.div>
           </motion.div>
 
-          {/* Hero visual - enhanced with more details */}
+          {/* Hero visual - with improved mobile sizing and visibility */}
           <motion.div
-            className="lg:w-1/2"
+            className="w-full sm:w-11/12 md:w-10/12 lg:w-1/2 mt-2"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5, duration: 0.7 }}
           >
             <div className="bg-gray-900/60 backdrop-blur p-1 rounded-xl border border-violet-900/50 overflow-hidden shadow-2xl shadow-violet-900/20 relative">
-              <div className="bg-gray-950 rounded-lg p-3">
+              <div className="bg-gray-950 rounded-lg p-2 sm:p-3">
                 {/* Code editor header */}
-                <div className="flex items-center mb-3">
+                <div className="flex items-center mb-2 sm:mb-3">
                   <div className="flex space-x-1.5 mr-3">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                    <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-red-500"></div>
+                    <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-yellow-500"></div>
+                    <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-green-500"></div>
                   </div>
-                  <div className="flex-1 bg-gray-800 rounded-md h-5 flex items-center justify-center">
-                    <span className="text-gray-400 text-xs">
+                  <div className="flex-1 bg-gray-800 rounded-md h-4 sm:h-5 flex items-center justify-center">
+                    <span className="text-gray-400 text-[10px] sm:text-xs">
                       edu_chain.sol
                     </span>
                   </div>
                 </div>
 
-                {/* Code snippet with fixed alignment */}
+                {/* Code snippet with fixed alignment and mobile optimizations - FIX FOR LINE NUMBERS */}
                 <div className="relative">
-                  {/* Line numbers column */}
-                  <div className="absolute top-0 left-0 flex flex-col text-xs text-gray-600 select-none font-mono pt-3 pl-3">
+                  {/* Line numbers column - improved spacing */}
+                  <div className="absolute top-0 left-0 flex flex-col text-[10px] xs:text-xs text-gray-600 select-none font-mono pt-2 sm:pt-3 pl-2 sm:pl-3">
                     {[...Array(12)].map((_, i) => (
-                      <div key={i} className="h-[1.3rem] text-right pr-2">
+                      <div
+                        key={i}
+                        className="h-[1.1rem] xs:h-[1.2rem] sm:h-[1.3rem] md:h-[1.4rem] lg:h-[1.5rem] text-right pr-3 md:pr-4"
+                      >
                         {i + 1}
                       </div>
                     ))}
                   </div>
 
-                  {/* Code content with left padding for line numbers */}
-                  <pre className="font-mono text-xs text-gray-300 overflow-x-auto p-3 pl-10">
+                  {/* Code content with increased padding for larger screens */}
+                  <pre className="font-mono text-[10px] sm:text-xs text-gray-300 overflow-x-auto p-2 sm:p-3 pl-10 md:pl-12 lg:pl-14">
                     <code>
                       <span className="text-violet-400">pragma</span>{" "}
                       <span className="text-blue-400">solidity</span> ^0.8.0;
                       {"\n\n"}
                       <span className="text-violet-400">contract</span>{" "}
-                      <span className="text-green-400">EduChainLab</span>{" "}
-                      {"{"}
+                      <span className="text-green-400">EduChainLab</span> {"{"}
                       {"\n"}
                       {"    "}
                       <span className="text-blue-400">
@@ -292,13 +295,13 @@ const HeroSection = () => {
                   </pre>
                 </div>
 
-                {/* Added status bar */}
-                <div className="flex items-center justify-between mt-2 px-2 py-1 bg-gray-800/50 rounded text-xs text-gray-400">
+                {/* Added status bar with mobile optimizations */}
+                <div className="flex items-center justify-between mt-1 sm:mt-2 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-800/50 rounded text-[10px] xs:text-xs text-gray-400">
                   <div className="flex items-center">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-green-500 rounded-full mr-1 sm:mr-2"></div>
                     <span>Compiled successfully</span>
                   </div>
-                  <div className="flex items-center space-x-4">
+                  <div className="hidden xs:flex items-center space-x-2 sm:space-x-4">
                     <span>Ln 9, Col 22</span>
                     <span>UTF-8</span>
                     <span>Solidity</span>
@@ -307,14 +310,14 @@ const HeroSection = () => {
               </div>
             </div>
 
-            {/* Floating badges */}
+            {/* Floating badges - repositioned for mobile */}
             <motion.div
-              className="absolute -right-4 lg:right-5 top-32 lg:top-20 flex items-center justify-center bg-purple-600 backdrop-blur rounded-lg px-2.5 py-1 shadow-lg shadow-violet-800/20"
+              className="absolute right-4 top-20 sm:top-24 lg:top-30 hidden lg:flex items-center justify-center bg-purple-600 backdrop-blur rounded-lg px-2 py-0.5 sm:px-2.5 sm:py-1 shadow-lg shadow-violet-800/20"
               initial={{ opacity: 0, y: 20, x: 10 }}
               animate={{ opacity: 1, y: 0, x: 0 }}
               transition={{ delay: 1.1, duration: 0.5 }}
             >
-              <span className="text-xs text-white font-medium">
+              <span className="text-[10px] xs:text-xs text-white font-medium">
                 Solidity Editor
               </span>
             </motion.div>
@@ -322,16 +325,16 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Added animated scrolling indicator */}
+      {/* Added animated scrolling indicator - hidden on very small screens */}
       <motion.div
-        className="absolute bottom-8 left-1/2 flex flex-col justify-center items-center"
+        className="absolute bottom-4 sm:bottom-8 left-1/2 hidden xs:flex flex-col justify-center items-center"
         initial={{ opacity: 0, y: -10, x: "-50%" }}
         animate={{ opacity: 0.7, y: 0, x: "-50%" }}
         transition={{ delay: 2, duration: 0.5 }}
       >
         <span className="text-xs text-gray-400 mb-2">Scroll to explore</span>
         <motion.div
-          className="w-5 h-8 border-2 border-gray-400 rounded-full flex justify-center"
+          className="w-4 sm:w-5 h-6 sm:h-8 border-2 border-gray-400 rounded-full flex justify-center"
           animate={{
             borderColor: [
               "rgba(139, 92, 246, 0.3)",
@@ -343,7 +346,7 @@ const HeroSection = () => {
         >
           <motion.div
             className="w-1 h-1 bg-violet-400 rounded-full mt-1"
-            animate={{ y: [0, 10, 0] }}
+            animate={{ y: [0, 8, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           />
         </motion.div>
