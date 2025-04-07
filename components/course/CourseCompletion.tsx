@@ -7,8 +7,8 @@ import { Award, ExternalLink } from "lucide-react";
 
 interface CourseCompletionProps {
   courseId: string;
-  metadataIndex: number;
-  nftMinted?: boolean; // Add this prop to check if already minted
+  metadataURI: string;
+  nftMinted?: boolean;
 }
 
 // Declare window ethereum interface
@@ -20,7 +20,7 @@ declare global {
 
 const CourseCompletion: React.FC<CourseCompletionProps> = ({
   courseId,
-  metadataIndex,
+  metadataURI,
   nftMinted = false, // Default to false if not provided
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -95,7 +95,8 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
         CONTRACT_ABI,
         signer
       );
-      const tx = await contract.mintCertificate(address, metadataIndex);
+      const tx = await contract.mintCertificate(address, metadataURI);
+
       setTxHash(tx.hash);
       await tx.wait();
 
