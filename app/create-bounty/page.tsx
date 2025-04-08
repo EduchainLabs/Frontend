@@ -489,7 +489,7 @@ const CreateChallengePage = () => {
                 >
                   Cancel
                 </Link>
-                <button
+                {/* <button
                   className="px-5 py-2.5 bg-transparent border border-gray-700 hover:bg-gray-800 text-gray-300 font-medium rounded-lg transition-colors flex items-center justify-center"
                   onClick={() => {
                     const requirementsString = formData.requirements.join("&&");
@@ -498,12 +498,12 @@ const CreateChallengePage = () => {
                       formData.description,
                       requirementsString, // Passing requirements as a single string
                       formData.tags,
-                      parseInt(formData.durationInDays),
+                      parseInt(formData.durationInDays)
                     );
                   }}
                 >
                   Log Form Data
-                </button>
+                </button> */}
                 <button
                   type="submit"
                   disabled={isSubmitting}
