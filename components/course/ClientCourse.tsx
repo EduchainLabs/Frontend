@@ -118,6 +118,47 @@ export function ClientCourse({ courseId, lessonId }: ClientCourseProps) {
     fetchUserCourseData();
   }, [userOCId, courseId]);
 
+  useEffect(() => {
+    // Only run if we have a user ID
+    if (userOCId && course?.id) {
+      const fetchUserCourseStatus = async () => {
+        try {
+          // Use your existing endpoint that returns all courses for a user
+          const response = await fetch(`/api/users/courses?OCId=${userOCId}`);
+
+          if (response.ok) {
+            const data = await response.json();
+
+            if (data.success && data.courses.length > 0) {
+              // Find the current course in the user's courses
+              const currentCourse = data.courses.find(
+                (c: any) => c.id === course.id
+              );
+
+              if (currentCourse && currentCourse.completed) {
+                console.log("Course is already completed, setting state");
+                setCourseCompleted(true);
+
+                // Mark all lessons as completed if the course is completed
+                if (course.lessons) {
+                  const allLessonsCompleted: Record<string, boolean> = {};
+                  course.lessons.forEach((lesson) => {
+                    allLessonsCompleted[lesson.id] = true;
+                  });
+                  setLessonCompleted(allLessonsCompleted);
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Failed to fetch user course status:", error);
+        }
+      };
+
+      fetchUserCourseStatus();
+    }
+  }, [userOCId, course]);
+
   const recordCourseCompletion = async () => {
     console.log("Course completed:", course?.id);
 
