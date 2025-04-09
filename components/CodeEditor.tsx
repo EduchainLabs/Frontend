@@ -111,6 +111,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             "contract",
             "interface",
             "library",
+            "returns",
             "is",
             "public",
             "private",
