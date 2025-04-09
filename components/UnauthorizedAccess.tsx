@@ -2,15 +2,22 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useOCAuth } from "@opencampus/ocid-connect-js";
-import { Lock, Code, Trophy, BookOpen, Users } from "lucide-react";
+import {
+  Lock,
+  Code,
+  Trophy,
+  BookOpen,
+  Users,
+  ExternalLink,
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
 import LoginButton from "./LoginButton";
 
 interface UnauthorizedAccessProps {
-    requiredPath?: string;
-    }   
+  requiredPath?: string;
+}
 
-const UnauthorizedAccess = ({ requiredPath  } : UnauthorizedAccessProps ) => {
+const UnauthorizedAccess = ({ requiredPath }: UnauthorizedAccessProps) => {
   const { isInitialized, authState, ocAuth } = useOCAuth();
   const router = useRouter();
 
@@ -20,7 +27,6 @@ const UnauthorizedAccess = ({ requiredPath  } : UnauthorizedAccessProps ) => {
       router.push(requiredPath || "/dashboard");
     }
   }, [isInitialized, authState, router, requiredPath]);
-
 
   return (
     <div className="h-screen bg-gray-950 text-gray-100 overflow-hidden flex flex-col">
@@ -82,8 +88,27 @@ const UnauthorizedAccess = ({ requiredPath  } : UnauthorizedAccessProps ) => {
             {/* Auth button */}
             <div className="space-y-3 mb-4 flex flex-col justify-center items-center">
               <LoginButton />
-              <div className="text-center text-gray-400 text-xs">
+              {/* <div className="text-center text-gray-400 text-xs">
                 Need access? Contact your administrator for permissions.
+              </div> */}
+            </div>
+            <div className="mt-6 mb-4 p-4 bg-gradient-to-r from-violet-800/40 to-fuchsia-800/30 rounded-lg border border-violet-500/50 shadow-lg shadow-violet-900/20 transform hover:scale-[1.02] transition-all">
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-violet-600/40 rounded-full flex items-center justify-center mr-3 flex-shrink-0 shadow-md">
+                  <BookOpen className="w-5 h-5 text-violet-200" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-white">
+                    Having trouble getting started?
+                  </h3>
+                  <button
+                    onClick={() => router.push("/tutorials")}
+                    className="mt-1 text-xs text-violet-300 hover:text-white group flex items-center"
+                  >
+                    Check out our setup tutorials
+                    <ExternalLink className="w-3 h-3 ml-1 opacity-70 group-hover:opacity-100 transition-opacity" />
+                  </button>
+                </div>
               </div>
             </div>
 
