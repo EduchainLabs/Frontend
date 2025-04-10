@@ -247,7 +247,7 @@ const HeroSection = () => {
                       <span className="text-blue-400">solidity</span> ^0.8.0;
                       {"\n\n"}
                       <span className="text-violet-400">contract</span>{" "}
-                      <span className="text-green-400">EduChainLab</span> {"{"}
+                      <span className="text-green-400">EduchainLab</span> {"{"}
                       {"\n"}
                       {"    "}
                       <span className="text-blue-400">

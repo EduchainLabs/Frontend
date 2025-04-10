@@ -202,7 +202,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
               rel="noopener noreferrer"
               className="mt-2 flex items-center text-sm text-violet-400 hover:text-violet-300"
             >
-              View on EduChain Explorer{" "}
+              View on Educhain Explorer{" "}
               <ExternalLink className="ml-1 w-3 h-3" />
             </a>
           )}
