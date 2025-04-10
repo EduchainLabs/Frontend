@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { ethers } from "ethers";
 import { CONTRACT_ABI, CONTRACT_ADDRESS } from "@/utils/contract_constants2";
+import { useOCAuth } from "@opencampus/ocid-connect-js";
 
 interface ChallengeSummary {
   challengeId: number;
@@ -58,6 +59,12 @@ const CompetitionsPage = () => {
   const [totalBountyAmount, setTotalBountyAmount] = useState<string>("0");
   const [activeChallengesCount, setActiveChallengesCount] = useState<number>(0);
   const [totalSubmissions, setTotalSubmissions] = useState<number>(0);
+  const { isInitialized, authState , ocAuth  }  = useOCAuth();
+  let authData: { ethAddress: string } | null = null;
+  if (isInitialized && authState.isAuthenticated) {
+    authData = ocAuth.getAuthState();
+  }
+  
 
   // Filter challenges based on status and search query
   const filteredChallenges = challenges.filter((challenge) => {
@@ -431,14 +438,19 @@ const CompetitionsPage = () => {
                     {challenge.winner &&
                       challenge.winner !==
                         "0x0000000000000000000000000000000000000000" && (
-                        <div className="mt-2 flex items-center text-xs text-green-400 mb-2">
-                          <Award className="w-3 h-3 mr-1.5" />
-                          <span>
-                            Winner:{" "}
-                            {challenge.winner.substring(0, 6) +
-                              "..." +
-                              challenge.winner.substring(38)}
-                          </span>
+                        <div className="mt-2 flex items-center justify-between text-xs text-green-400 mb-2">
+                          <div className="flex items-center">
+                            <Award className="w-3 h-3 mr-1.5" />
+                            <span>
+                              Winner:{" "}
+                              {challenge.winner.substring(0, 6) +
+                                "..." +
+                                challenge.winner.substring(38)}
+                            </span>
+                          </div>{authData && authData.ethAddress === challenge.winner && (
+                          <button className="bg-green-500 text-white px-2 p-1 rounded-md" >
+                            Claim Reward
+                          </button>)}
                         </div>
                       )}
 
