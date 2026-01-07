@@ -11,9 +11,14 @@ import { useToast } from "@/components/ui/use-toast";
 import BackButton from "@/components/BackButton";
 import { useOCAuth } from "@opencampus/ocid-connect-js";
 
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL
+
+
 type ProblemLevel = "beginner" | "intermediate" | "advanced";
 type ThemeMode = "dark" | "light";
 type ValidationStatus = null | "validating" | "valid" | "invalid";
+
 
 interface ProblemStatement {
   title: string;
@@ -123,13 +128,13 @@ export default function PracticeArena() {
       let endpoint = "";
       switch (level) {
         case "beginner":
-          endpoint = "/api/generatePS";
+          endpoint = `${API_BASE}/generatePS`;
           break;
         case "intermediate":
-          endpoint = "/api/generatePSI";
+          endpoint = `${API_BASE}/generatePSI`;
           break;
         case "advanced":
-          endpoint = "/api/generatePSA";
+          endpoint = `${API_BASE}/generatePSA`;
           break;
       }
 
@@ -180,7 +185,7 @@ export default function PracticeArena() {
     setValidationStatus("validating");
     setShowValidation(true);
     try {
-      const response = await fetch("/api/validate-code", {
+      const response = await fetch(`${API_BASE}/validate-code`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -191,7 +196,16 @@ export default function PracticeArena() {
         }),
       });
 
-      const data = await response.json();
+      const text = await response.text();
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+      console.error("Non-JSON response:", text);
+      throw new Error("Invalid API response");
+      }
+
       setValidationResult(data);
       setValidationStatus(data.status ? "valid" : "invalid");
       const ai_score = Number(data.score || 0);
